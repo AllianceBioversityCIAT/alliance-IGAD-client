@@ -5,10 +5,10 @@
       <div class="container mx-auto px-4 py-12">
         <div class="text-center">
           <h1 class="text-4xl md:text-5xl mb-4 tracking-tight text-green-800">
-            🤖 AI Prompts Manager
+            {{ pageTitle }}
           </h1>
           <p class="text-xl text-green-700 mb-2 max-w-3xl mx-auto leading-relaxed">
-            Manage and organize your artificial intelligence prompts
+            Manage and organize your prompts
           </p>
         </div>
       </div>
@@ -78,8 +78,8 @@
           <div class="text-gray-600">Total Prompts</div>
         </div>
         <div class="bg-card text-card-foreground rounded-xl border-2 border-green-200 p-8 bg-white/80 backdrop-blur-sm shadow-lg">
-          <div class="text-4xl font-bold text-green-800 mb-2">{{ recentCount }}</div>
-          <div class="text-gray-600">Added Today</div>
+          <div class="text-4xl font-bold text-green-800 mb-2">{{ activePrompt ? '1' : '0' }}</div>
+          <div class="text-gray-600">Active Prompt</div>
         </div>
       </div>
 
@@ -117,21 +117,45 @@
           <div
             v-for="prompt in prompts"
             :key="prompt.id"
-            class="bg-card text-card-foreground rounded-xl border-2 border-green-200 hover:border-green-300 transition-all duration-300 p-8 shadow-lg group bg-white/80 backdrop-blur-sm"
+            :class="[
+              'bg-card text-card-foreground rounded-xl transition-all duration-300 p-8 shadow-lg group bg-white/80 backdrop-blur-sm',
+              prompt.is_active ? 'border-4 border-green-500' : 'border-2 border-green-200 hover:border-green-300'
+            ]"
           >
+            <!-- Active Badge -->
+            <div v-if="prompt.is_active" class="mb-4">
+              <span class="px-4 py-2 text-sm rounded-full bg-green-100 text-green-800 border-2 border-green-200 font-medium">
+                ✅ Active Prompt
+              </span>
+            </div>
+
             <div class="flex items-start justify-between mb-4">
               <div class="flex-1">
-                <h3 class="text-xl text-gray-900 flex items-center gap-2">
+                <h3 class="text-xl text-gray-900 flex items-center gap-2 mb-2">
                   💬 {{ prompt.title }}
                 </h3>
+                <div class="flex flex-col gap-1 text-sm text-gray-500">
+                  <span>Created by: <strong>{{ prompt.created_by_name }}</strong> ({{ prompt.created_by_email }})</span>
+                  <span>Last updated by: <strong>{{ prompt.updated_by_name }}</strong> ({{ prompt.updated_by_email }})</span>
+                </div>
               </div>
-              <button
-                @click="deletePrompt(prompt.id)"
-                class="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-md flex-shrink-0"
-                title="Delete"
-              >
-                🗑️
-              </button>
+              <div class="flex gap-2 flex-shrink-0">
+                <button
+                  v-if="!prompt.is_active"
+                  @click="activatePrompt(prompt.id)"
+                  class="opacity-0 group-hover:opacity-100 transition-opacity bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  title="Activate"
+                >
+                  ✓ Activate
+                </button>
+                <button
+                  @click="deletePrompt(prompt.id)"
+                  class="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-md"
+                  title="Delete"
+                >
+                  🗑️
+                </button>
+              </div>
             </div>
 
             <p class="text-gray-700 mb-4 leading-relaxed whitespace-pre-wrap">
@@ -150,6 +174,17 @@
         </transition-group>
       </div>
 
+      <!-- Back Button -->
+      <div class="mt-12 text-center">
+        <NuxtLink to="/prompts" class="inline-flex items-center gap-2 text-gray-600 hover:text-green-700 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 19-7-7 7-7"></path>
+            <path d="M19 12H5"></path>
+          </svg>
+          Back to Prompts Selection
+        </NuxtLink>
+      </div>
+
     </div>
   </div>
 </template>
@@ -157,11 +192,23 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 
+const route = useRoute()
+const promptType = computed(() => route.params.type as string)
+
 interface Prompt {
   id: number
+  type: string
   title: string
   prompt: string
+  is_active: number
+  created_by: number
+  updated_by: number
+  created_by_name: string
+  created_by_email: string
+  updated_by_name: string
+  updated_by_email: string
   created_at: string
+  updated_at: string
 }
 
 const prompts = ref<Prompt[]>([])
@@ -172,21 +219,29 @@ const loadingPrompts = ref(true)
 const message = ref('')
 const messageType = ref<'success' | 'error'>('success')
 
+const pageTitle = computed(() => {
+  if (promptType.value === 'proposal-writer') return '📝 Proposal Writer Prompts'
+  if (promptType.value === 'newsletter-generator') return '📧 Newsletter Generator Prompts'
+  return 'Prompts Manager'
+})
+
+const dbType = computed(() => {
+  if (promptType.value === 'proposal-writer') return 'proposal_writer'
+  if (promptType.value === 'newsletter-generator') return 'newsletter_generator'
+  return ''
+})
+
+const activePrompt = computed(() => prompts.value.find(p => p.is_active === 1))
+
 const messageClass = computed(() => ({
   'bg-green-100 text-green-800 border-2 border-green-200': messageType.value === 'success',
   'bg-red-100 text-red-800 border-2 border-red-200': messageType.value === 'error'
 }))
 
-const recentCount = computed(() => {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  return prompts.value.filter(p => new Date(p.created_at) >= today).length
-})
-
 const loadPrompts = async () => {
   loadingPrompts.value = true
   try {
-    const data = await $fetch('/api/prompts/list')
+    const data = await $fetch(`/api/prompts/list?type=${dbType.value}`)
     if (data.success) {
       prompts.value = data.prompts
     }
@@ -205,6 +260,7 @@ const savePrompt = async () => {
     const data = await $fetch('/api/prompts/create', {
       method: 'POST',
       body: {
+        type: dbType.value,
         title: title.value,
         prompt: newPrompt.value
       }
@@ -229,6 +285,22 @@ const savePrompt = async () => {
     message.value = `❌ Error: ${error.message}`
   } finally {
     loading.value = false
+  }
+}
+
+const activatePrompt = async (id: number) => {
+  try {
+    const data = await $fetch(`/api/prompts/activate?id=${id}`)
+    if (data.success) {
+      await loadPrompts()
+      messageType.value = 'success'
+      message.value = '✅ Prompt activated'
+      setTimeout(() => {
+        message.value = ''
+      }, 3000)
+    }
+  } catch (error) {
+    console.error('Error activating prompt:', error)
   }
 }
 
@@ -272,8 +344,15 @@ const formatDate = (dateString: string) => {
   })
 }
 
-onMounted(() => {
-  loadPrompts()
+onMounted(async () => {
+  // Check authentication
+  const auth = await $fetch('/api/auth/me')
+  if (!auth.authenticated) {
+    navigateTo('/')
+    return
+  }
+
+  await loadPrompts()
 })
 </script>
 
