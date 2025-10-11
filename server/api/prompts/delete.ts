@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const db = event.context.cloudflare?.env?.DB
 
   if (!db) {
-    return { success: false, error: "Base de datos no disponible" }
+    return { success: false, error: "Database not available" }
   }
 
   try {
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     if (!id) {
       return {
         success: false,
-        error: "El parámetro 'id' es requerido"
+        error: "The 'id' parameter is required"
       }
     }
 
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      message: "Prompt eliminado exitosamente"
+      message: "Prompt deleted successfully"
     }
   } catch (error: any) {
     return {

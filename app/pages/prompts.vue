@@ -8,7 +8,7 @@
           🤖 AI Prompts Manager
         </h1>
         <p class="text-slate-600 dark:text-slate-400 text-lg">
-          Gestiona y organiza tus prompts de inteligencia artificial
+          Manage and organize your artificial intelligence prompts
         </p>
       </div>
 
@@ -17,54 +17,42 @@
         <form @submit.prevent="savePrompt" class="space-y-4">
           <div>
             <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-              ✨ Nuevo Prompt
+              📝 Title
+            </label>
+            <input
+              v-model="title"
+              type="text"
+              placeholder="Enter a title for your prompt..."
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-slate-400"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+              ✨ Prompt
             </label>
             <textarea
               v-model="newPrompt"
-              placeholder="Escribe tu prompt aquí... 💭"
-              rows="4"
+              placeholder="Write your prompt here... 💭"
+              rows="6"
               class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none placeholder:text-slate-400"
               required
             ></textarea>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
-                🎯 Modelo (opcional)
-              </label>
-              <input
-                v-model="model"
-                type="text"
-                placeholder="ej: gpt-4, claude-3"
-                class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
-                📊 Tokens (opcional)
-              </label>
-              <input
-                v-model.number="tokens"
-                type="number"
-                placeholder="ej: 1500"
-                class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              />
-            </div>
-          </div>
-
           <button
             type="submit"
-            :disabled="loading || !newPrompt"
+            :disabled="loading || !newPrompt || !title"
             class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
-            <span v-if="!loading">💾 Guardar Prompt</span>
+            <span v-if="!loading">💾 Save Prompt</span>
             <span v-else class="flex items-center justify-center gap-2">
               <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Guardando...
+              Saving...
             </span>
           </button>
         </form>
@@ -78,25 +66,21 @@
       </div>
 
       <!-- Stats -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
-          <div class="text-3xl font-bold">{{ prompts.length }}</div>
-          <div class="text-blue-100 text-sm">Total Prompts</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
+          <div class="text-4xl font-bold">{{ prompts.length }}</div>
+          <div class="text-blue-100 text-sm mt-1">Total Prompts</div>
         </div>
-        <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-5 text-white shadow-lg">
-          <div class="text-3xl font-bold">{{ totalTokens.toLocaleString() }}</div>
-          <div class="text-indigo-100 text-sm">Total Tokens</div>
-        </div>
-        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-5 text-white shadow-lg">
-          <div class="text-3xl font-bold">{{ uniqueModels }}</div>
-          <div class="text-purple-100 text-sm">Modelos Únicos</div>
+        <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
+          <div class="text-4xl font-bold">{{ recentCount }}</div>
+          <div class="text-indigo-100 text-sm mt-1">Added Today</div>
         </div>
       </div>
 
       <!-- Prompts History -->
       <div class="mb-6">
         <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
-          📚 Historial de Prompts
+          📚 Prompts History
           <span class="text-sm font-normal text-slate-500 dark:text-slate-400">({{ prompts.length }})</span>
         </h2>
       </div>
@@ -107,17 +91,17 @@
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <p class="text-slate-600 dark:text-slate-400 mt-4">Cargando prompts...</p>
+        <p class="text-slate-600 dark:text-slate-400 mt-4">Loading prompts...</p>
       </div>
 
       <!-- Empty State -->
       <div v-else-if="prompts.length === 0" class="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600">
         <div class="text-6xl mb-4">📝</div>
         <h3 class="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
-          No hay prompts todavía
+          No prompts yet
         </h3>
         <p class="text-slate-500 dark:text-slate-400">
-          ¡Crea tu primer prompt usando el formulario de arriba!
+          Create your first prompt using the form above!
         </p>
       </div>
 
@@ -130,19 +114,15 @@
             class="bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-slate-200 dark:border-slate-700 group"
           >
             <div class="flex items-start justify-between mb-3">
-              <div class="flex items-center gap-2">
-                <span class="text-2xl">💬</span>
-                <span class="text-xs font-medium px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">
-                  {{ prompt.model }}
-                </span>
-                <span v-if="prompt.tokens > 0" class="text-xs font-medium px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300">
-                  {{ prompt.tokens }} tokens
-                </span>
+              <div class="flex-1">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                  💬 {{ prompt.title }}
+                </h3>
               </div>
               <button
                 @click="deletePrompt(prompt.id)"
-                class="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
-                title="Eliminar"
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg flex-shrink-0"
+                title="Delete"
               >
                 🗑️
               </button>
@@ -151,13 +131,6 @@
             <p class="text-slate-700 dark:text-slate-300 mb-4 leading-relaxed whitespace-pre-wrap">
               {{ prompt.prompt }}
             </p>
-
-            <div v-if="prompt.response" class="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 mb-4 border-l-4 border-green-500">
-              <div class="text-xs font-semibold text-green-600 dark:text-green-400 mb-2">✅ Respuesta:</div>
-              <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed whitespace-pre-wrap">
-                {{ prompt.response }}
-              </p>
-            </div>
 
             <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
               <span class="flex items-center gap-1">
@@ -180,18 +153,14 @@ import { ref, computed, onMounted } from 'vue'
 
 interface Prompt {
   id: number
+  title: string
   prompt: string
-  response: string | null
-  model: string
-  tokens: number
   created_at: string
-  updated_at: string
 }
 
 const prompts = ref<Prompt[]>([])
+const title = ref('')
 const newPrompt = ref('')
-const model = ref('')
-const tokens = ref<number | null>(null)
 const loading = ref(false)
 const loadingPrompts = ref(true)
 const message = ref('')
@@ -202,12 +171,10 @@ const messageClass = computed(() => ({
   'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border border-red-300 dark:border-red-700': messageType.value === 'error'
 }))
 
-const totalTokens = computed(() => {
-  return prompts.value.reduce((sum, p) => sum + (p.tokens || 0), 0)
-})
-
-const uniqueModels = computed(() => {
-  return new Set(prompts.value.map(p => p.model)).size
+const recentCount = computed(() => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return prompts.value.filter(p => new Date(p.created_at) >= today).length
 })
 
 const loadPrompts = async () => {
@@ -232,18 +199,16 @@ const savePrompt = async () => {
     const data = await $fetch('/api/prompts/create', {
       method: 'POST',
       body: {
-        prompt: newPrompt.value,
-        model: model.value || 'default',
-        tokens: tokens.value || 0
+        title: title.value,
+        prompt: newPrompt.value
       }
     })
 
     if (data.success) {
       messageType.value = 'success'
-      message.value = '✅ Prompt guardado exitosamente'
+      message.value = '✅ Prompt saved successfully'
+      title.value = ''
       newPrompt.value = ''
-      model.value = ''
-      tokens.value = null
       await loadPrompts()
       
       setTimeout(() => {
@@ -262,14 +227,14 @@ const savePrompt = async () => {
 }
 
 const deletePrompt = async (id: number) => {
-  if (!confirm('¿Estás seguro de eliminar este prompt?')) return
+  if (!confirm('Are you sure you want to delete this prompt?')) return
   
   try {
     const data = await $fetch(`/api/prompts/delete?id=${id}`)
     if (data.success) {
       await loadPrompts()
       messageType.value = 'success'
-      message.value = '🗑️ Prompt eliminado'
+      message.value = '🗑️ Prompt deleted'
       setTimeout(() => {
         message.value = ''
       }, 3000)
@@ -287,12 +252,12 @@ const formatDate = (dateString: string) => {
   const diffHours = Math.floor(diffMs / 3600000)
   const diffDays = Math.floor(diffMs / 86400000)
 
-  if (diffMins < 1) return 'Hace un momento'
-  if (diffMins < 60) return `Hace ${diffMins} min${diffMins > 1 ? 's' : ''}`
-  if (diffHours < 24) return `Hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`
-  if (diffDays < 7) return `Hace ${diffDays} día${diffDays > 1 ? 's' : ''}`
+  if (diffMins < 1) return 'Just now'
+  if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
   
-  return date.toLocaleDateString('es-ES', {
+  return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

@@ -2,33 +2,27 @@ export default defineEventHandler(async (event) => {
   const db = event.context.cloudflare?.env?.DB
 
   if (!db) {
-    return { success: false, error: "Base de datos no disponible" }
+    return { success: false, error: "Database not available" }
   }
 
   try {
-    // Obtener datos del body
+    // Get data from body
     const body = await readBody(event)
-    const { prompt, response, model, tokens } = body
+    const { title, prompt } = body
 
-    if (!prompt) {
+    if (!title || !prompt) {
       return {
         success: false,
-        error: "El campo 'prompt' es requerido"
+        error: "Both 'title' and 'prompt' fields are required"
       }
     }
 
-    // Insertar el nuevo prompt
+    // Insert new prompt
     const result = await db.prepare(
-      `INSERT INTO prompts (prompt, response, model, tokens) 
-       VALUES (?, ?, ?, ?)`
-    ).bind(
-      prompt,
-      response || null,
-      model || 'default',
-      tokens || 0
-    ).run()
+      `INSERT INTO prompts (title, prompt) VALUES (?, ?)`
+    ).bind(title, prompt).run()
 
-    // Obtener el registro recién creado
+    // Get the newly created record
     const { results } = await db.prepare(
       "SELECT * FROM prompts WHERE id = ?"
     ).bind(result.meta.last_row_id).all()
@@ -36,7 +30,7 @@ export default defineEventHandler(async (event) => {
     return {
       success: true,
       prompt: results[0],
-      message: "Prompt guardado exitosamente"
+      message: "Prompt saved successfully"
     }
   } catch (error: any) {
     return {
