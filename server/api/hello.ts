@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
   return {
     hello: "Hello from SSR server api by IGAD",
     kv_data: value || null,
-    access_key: access_key,
+    access_keys: access_key || null,
     MY_VARIABLE: MY_VARIABLE
   }
 })
