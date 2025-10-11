@@ -217,6 +217,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  middleware: 'auth'
+})
+
 interface Message {
   role: 'user' | 'assistant' | 'system'
   content: string
@@ -362,8 +366,12 @@ const scrollToBottom = () => {
   }
 }
 
-onMounted(() => {
-  checkAuth()
+onMounted(async () => {
+  await checkAuth()
+  // If not authenticated after check, redirect to home
+  if (!user.value) {
+    navigateTo('/')
+  }
 })
 </script>
 
