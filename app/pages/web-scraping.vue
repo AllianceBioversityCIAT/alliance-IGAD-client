@@ -146,7 +146,7 @@
         <div class="lg:col-span-1">
           <div class="bg-gray-900 rounded-lg shadow-lg p-4 sticky top-24">
             <div class="flex items-center justify-between mb-3">
-              <h3 class="text-white font-semibold">JSON Response</h3>
+              <h3 class="text-white font-semibold">Respuesta JSON</h3>
               <button
                 @click="copyJson"
                 class="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition-colors"
@@ -229,6 +229,120 @@
         </div>
       </div>
 
+      <!-- Floating Chat Button & Chat Window -->
+      <div v-if="publications.length > 0" class="fixed bottom-6 right-6 z-50">
+        <!-- Chat Button -->
+        <button
+          v-if="!chatOpen"
+          @click="chatOpen = true"
+          class="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full shadow-2xl hover:shadow-3xl transition-all hover:scale-110 flex items-center justify-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+        </button>
+
+        <!-- Chat Window -->
+        <div
+          v-else
+          class="bg-white rounded-2xl shadow-2xl w-96 h-[600px] flex flex-col overflow-hidden border-2 border-purple-200"
+        >
+          <!-- Chat Header -->
+          <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+              <div>
+                <h3 class="font-bold text-sm">Consulta sobre Publicaciones</h3>
+                <p class="text-xs text-purple-100">{{ publications.length }} publicaciones cargadas</p>
+              </div>
+            </div>
+            <button
+              @click="chatOpen = false"
+              class="text-white hover:bg-white/20 rounded-lg p-1 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Chat Messages -->
+          <div ref="chatMessagesContainer" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+            <!-- Welcome Message -->
+            <div v-if="chatMessages.length === 0" class="text-center py-8">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-purple-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <p class="text-sm text-gray-600 font-medium mb-2">¡Pregunta sobre las publicaciones!</p>
+              <p class="text-xs text-gray-500 px-4">
+                Puedo responder preguntas basadas en los títulos y descripciones de las {{ publications.length }} publicaciones scrapeadas.
+              </p>
+            </div>
+
+            <!-- Messages -->
+            <div v-for="(msg, index) in chatMessages" :key="index" class="flex" :class="msg.role === 'user' ? 'justify-end' : 'justify-start'">
+              <div
+                class="max-w-[80%] rounded-xl px-4 py-2 shadow-sm"
+                :class="msg.role === 'user' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-white text-gray-900 border border-gray-200'"
+              >
+                <p class="text-sm whitespace-pre-wrap">{{ msg.content }}</p>
+                <p class="text-xs mt-1 opacity-70" :class="msg.role === 'user' ? 'text-right' : 'text-left'">
+                  {{ formatTime(msg.timestamp) }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Loading -->
+            <div v-if="chatLoading" class="flex justify-start">
+              <div class="bg-white rounded-xl px-4 py-3 border border-gray-200 shadow-sm">
+                <div class="flex gap-1">
+                  <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                  <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                  <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input -->
+          <div class="border-t border-gray-200 p-3 bg-white">
+            <form @submit.prevent="sendChatMessage" class="flex gap-2">
+              <input
+                v-model="chatInput"
+                type="text"
+                placeholder="Pregunta sobre las publicaciones..."
+                class="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all text-sm"
+                :disabled="chatLoading"
+              />
+              <button
+                type="submit"
+                :disabled="chatLoading || !chatInput.trim()"
+                class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg v-if="!chatLoading" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+                <svg v-else class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </button>
+            </form>
+            <button
+              v-if="chatMessages.length > 0"
+              @click="clearChatMessages"
+              class="text-xs text-red-600 hover:text-red-700 font-medium mt-2"
+            >
+              Limpiar conversación
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Empty State -->
       <div v-else-if="!loading" class="text-center py-12">
         <svg
@@ -262,6 +376,12 @@ interface Publication {
   image: string
 }
 
+interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: string
+}
+
 const user = ref<any>(null)
 const showLoginModal = ref(false)
 const loginEmail = ref('')
@@ -276,6 +396,13 @@ const targetUrl = ref('https://www.fao.org/pastoralist-knowledge-hub/knowledge-r
 const scrapedUrl = ref('')
 const jsonData = ref('')
 const jsonCopied = ref(false)
+
+// Chat states
+const chatOpen = ref(false)
+const chatMessages = ref<ChatMessage[]>([])
+const chatInput = ref('')
+const chatLoading = ref(false)
+const chatMessagesContainer = ref<HTMLElement | null>(null)
 
 const checkAuth = async () => {
   try {
@@ -331,6 +458,9 @@ const scrapePublications = async () => {
   publications.value = []
   jsonData.value = ''
   scrapedUrl.value = ''
+  // Reset chat when scraping new publications
+  chatMessages.value = []
+  chatOpen.value = false
 
   try {
     const response = await $fetch('/api/scrape-publications', {
@@ -363,6 +493,90 @@ const copyJson = async () => {
     }, 2000)
   } catch (err) {
     console.error('Error copying to clipboard:', err)
+  }
+}
+
+const sendChatMessage = async () => {
+  if (!chatInput.value.trim() || chatLoading.value) return
+
+  const userMessage: ChatMessage = {
+    role: 'user',
+    content: chatInput.value.trim(),
+    timestamp: new Date().toISOString()
+  }
+
+  chatMessages.value.push(userMessage)
+  const messageToSend = chatInput.value
+  chatInput.value = ''
+  chatLoading.value = true
+
+  // Scroll to bottom
+  nextTick(() => {
+    scrollChatToBottom()
+  })
+
+  try {
+    const history = chatMessages.value
+      .map(m => ({ role: m.role, content: m.content }))
+
+    const response = await $fetch('/api/ai-publications-chat', {
+      method: 'POST',
+      body: {
+        message: messageToSend,
+        publications: publications.value.map(p => ({
+          title: p.title,
+          date: p.date,
+          description: p.description,
+          url: p.url
+        })),
+        history: history.slice(0, -1) // Exclude the message we just added
+      }
+    })
+
+    if (response.success) {
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: response.response,
+        timestamp: response.timestamp
+      }
+      chatMessages.value.push(assistantMessage)
+    } else {
+      const errorMessage: ChatMessage = {
+        role: 'assistant',
+        content: `Error: ${response.error || 'No se pudo obtener respuesta'}`,
+        timestamp: new Date().toISOString()
+      }
+      chatMessages.value.push(errorMessage)
+    }
+  } catch (error: any) {
+    const errorMessage: ChatMessage = {
+      role: 'assistant',
+      content: `Error: ${error.message || 'Error de conexión con la IA'}`,
+      timestamp: new Date().toISOString()
+    }
+    chatMessages.value.push(errorMessage)
+  } finally {
+    chatLoading.value = false
+    nextTick(() => {
+      scrollChatToBottom()
+    })
+  }
+}
+
+const clearChatMessages = () => {
+  if (confirm('¿Estás seguro de que quieres limpiar la conversación?')) {
+    chatMessages.value = []
+  }
+}
+
+const formatTime = (timestamp: string) => {
+  const date = new Date(timestamp)
+  return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+}
+
+const scrollChatToBottom = () => {
+  if (chatMessagesContainer.value) {
+    chatMessagesContainer.value.scrollTop = chatMessagesContainer.value.scrollHeight
   }
 }
 

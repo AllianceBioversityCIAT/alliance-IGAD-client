@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
 
   if (!browserBinding) {
     return { 
+      success: false,
       error: "Browser binding no disponible",
       message: "Asegúrate de que MYBROWSER esté configurado en wrangler.toml"
     }
@@ -20,9 +21,13 @@ export default defineEventHandler(async (event) => {
     const html = await page.content()
     await browser.close()
 
-    return html
+    return {
+      success: true,
+      html
+    }
   } catch (error) {
     return {
+      success: false,
       error: "Error al ejecutar puppeteer",
       message: error instanceof Error ? error.message : String(error)
     }
