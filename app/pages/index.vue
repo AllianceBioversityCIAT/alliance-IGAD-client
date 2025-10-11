@@ -4,23 +4,33 @@
     <div class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-16">
-          <div class="flex items-center gap-2">
-            <img src="/igad-logo.png" alt="IGAD Logo" class="h-8 w-auto" />
-            <span class="text-lg font-semibold text-green-800">IGAD AI Hub</span>
+          <div class="flex items-center gap-6">
+            <NuxtLink to="/" class="flex items-center gap-2">
+              <img src="/igad-logo.png" alt="IGAD Logo" class="h-8 w-auto" />
+              <span class="text-lg font-semibold text-green-800">IGAD AI Hub</span>
+            </NuxtLink>
+            <nav class="flex items-center gap-4">
+              <NuxtLink to="/web-scraping" class="text-gray-600 hover:text-green-600 transition-colors">
+                Web Scraping
+              </NuxtLink>
+              <NuxtLink to="/ai-chat" class="text-gray-600 hover:text-green-600 transition-colors">
+                Chat con IA
+              </NuxtLink>
+            </nav>
           </div>
           
           <div class="flex items-center gap-4">
             <template v-if="user">
-              <span class="text-gray-600">Welcome, <strong>{{ user.name }}</strong></span>
+              <span class="text-gray-600">Hola, <strong>{{ user.name }}</strong></span>
               <NuxtLink to="/prompts" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
-                Manage Prompts
+                Gestionar Prompts
               </NuxtLink>
               <button @click="logout" class="px-4 py-2 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors">
-                Logout
+                Cerrar Sesión
               </button>
             </template>
             <button v-else @click="showLoginModal = true" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
-              Login
+              Iniciar Sesión
             </button>
           </div>
         </div>
@@ -30,25 +40,25 @@
     <!-- Login Modal -->
     <div v-if="showLoginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Login to IGAD AI Hub</h2>
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Iniciar Sesión en IGAD AI Hub</h2>
         <form @submit.prevent="login" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
             <input
               v-model="loginEmail"
               type="email"
-              placeholder="Enter your email..."
+              placeholder="Ingresa tu correo..."
               class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
               required
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
             <input
               v-model="loginPassword"
               type="password"
-              placeholder="Enter your password..."
+              placeholder="Ingresa tu contraseña..."
               class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
               required
             />
@@ -64,14 +74,14 @@
               @click="showLoginModal = false"
               class="flex-1 px-4 py-3 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               type="submit"
               :disabled="loginLoading"
               class="flex-1 px-4 py-3 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors disabled:opacity-50"
             >
-              {{ loginLoading ? 'Loading...' : 'Login' }}
+              {{ loginLoading ? 'Cargando...' : 'Iniciar Sesión' }}
             </button>
           </div>
         </form>
@@ -242,6 +252,37 @@
             </div>
           </div>
         </div>
+
+        <!-- Web Scraping - Available -->
+        <NuxtLink to="/web-scraping" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl group relative overflow-hidden transition-all duration-300 hover:shadow-xl border-2 border-green-200 hover:border-green-300 cursor-pointer">
+          <div class="absolute top-4 right-4">
+            <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 border border-green-200">Available</span>
+          </div>
+          <div class="p-8">
+            <div class="flex flex-col space-y-6">
+              <div class="self-start p-4 rounded-xl transition-colors bg-green-100 group-hover:bg-green-200">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe text-green-700">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                  <path d="M2 12h20"></path>
+                </svg>
+              </div>
+              <div class="space-y-3">
+                <h3 class="text-xl text-gray-900">Web Scraping</h3>
+                <p class="text-gray-600 leading-relaxed">Extract publications and research data from FAO and other sources</p>
+              </div>
+              <div class="pt-4">
+                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 w-full bg-green-600 hover:bg-green-700 text-white group-hover:translate-x-1 transition-transform">
+                  Launch Tool
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right ml-2 h-4 w-4">
+                    <path d="M5 12h14"></path>
+                    <path d="m12 5 7 7-7 7"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </NuxtLink>
 
         <!-- Agribusiness Hub - Coming Soon -->
         <div class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl group relative overflow-hidden transition-all duration-300 hover:shadow-xl border-2 border-gray-200 opacity-75">
