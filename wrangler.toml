@@ -18,6 +18,12 @@ binding = "MYBROWSER"
 [ai]
 binding = "AI"
 
+[[d1_databases]]
+binding = "DB"
+database_name = "igad-db"
+database_id = "95d444dd-04c7-4634-a6c9-866e51bbdc94"
+remote = true
+
 # # Opcional: overrides para PREVIEW
 # [[env.preview.kv_namespaces]]
 # binding = "astro"
