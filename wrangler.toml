@@ -1,0 +1,13 @@
+name = "astro-c"                      # nombre del proyecto Pages
+pages_build_output_dir = "./dist"     # carpeta que sube Pages
+compatibility_date = "2025-09-30"
+compatibility_flags = ["nodejs_compat"]
+
+[[kv_namespaces]]
+binding = "MY_KV"
+id = "df7b708d27464714ae3a8545aa5b0585"
+
+# # Opcional: overrides para PREVIEW
+# [[env.preview.kv_namespaces]]
+# binding = "astro"
+# id = "d3e7d385ad124a97bcdff6d5cf63c48b"
