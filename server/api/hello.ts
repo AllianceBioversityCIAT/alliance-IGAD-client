@@ -1,14 +1,14 @@
 export default defineEventHandler(async (event) => {
   const env = event.context.cloudflare?.env 
   const kv = env?.MY_KV
-  const MY_VARIABLE = env?.MY_VARIABLE
+  const access_key = env?.access_key
 
   if (!kv) {
     return { 
       hello: "Hello from SSR server api by IGAD",
       error: "KV no disponible" ,
       kv: kv,
-      MY_VARIABLE: MY_VARIABLE
+      access_key: access_key
     }
   }
 
@@ -18,6 +18,7 @@ export default defineEventHandler(async (event) => {
   return {
     hello: "Hello from SSR server api by IGAD",
     kv_data: value || null,
-    kv: kv
+    kv: kv,
+    access_key: access_key
   }
 })
