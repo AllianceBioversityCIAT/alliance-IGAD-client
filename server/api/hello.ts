@@ -5,7 +5,8 @@ export default defineEventHandler(async (event) => {
   if (!kv) {
     return { 
       hello: "Hello from SSR server api by IGAD",
-      error: "KV no disponible" 
+      error: "KV no disponible" ,
+      kv: kv
     }
   }
 
@@ -14,6 +15,7 @@ export default defineEventHandler(async (event) => {
 
   return {
     hello: "Hello from SSR server api by IGAD",
-    kv_data: value || null
+    kv_data: value || null,
+    kv: kv
   }
 })
