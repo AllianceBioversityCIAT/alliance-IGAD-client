@@ -1,42 +1,46 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-    <div class="container mx-auto px-4 py-8 max-w-6xl">
-      
-      <!-- Header -->
-      <div class="text-center mb-12">
-        <h1 class="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3">
-          🤖 AI Prompts Manager
-        </h1>
-        <p class="text-slate-600 dark:text-slate-400 text-lg">
-          Manage and organize your artificial intelligence prompts
-        </p>
+  <div class="min-h-screen bg-background">
+    <!-- Header -->
+    <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-b border-green-100">
+      <div class="container mx-auto px-4 py-12">
+        <div class="text-center">
+          <h1 class="text-4xl md:text-5xl mb-4 tracking-tight text-green-800">
+            🤖 AI Prompts Manager
+          </h1>
+          <p class="text-xl text-green-700 mb-2 max-w-3xl mx-auto leading-relaxed">
+            Manage and organize your artificial intelligence prompts
+          </p>
+        </div>
       </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-16 max-w-6xl">
 
       <!-- Input Section -->
-      <div class="mb-8 bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 border border-slate-200 dark:border-slate-700">
-        <form @submit.prevent="savePrompt" class="space-y-4">
+      <div class="mb-8 bg-card text-card-foreground rounded-xl border-2 border-green-200 p-8 shadow-lg bg-white/80 backdrop-blur-sm">
+        <form @submit.prevent="savePrompt" class="space-y-6">
           <div>
-            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
               📝 Title
             </label>
             <input
               v-model="title"
               type="text"
               placeholder="Enter a title for your prompt..."
-              class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-slate-400"
+              class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all placeholder:text-gray-400"
               required
             />
           </div>
 
           <div>
-            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
               ✨ Prompt
             </label>
             <textarea
               v-model="newPrompt"
-              placeholder="Write your prompt here... 💭"
+              placeholder="Write your prompt here..."
               rows="6"
-              class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none placeholder:text-slate-400"
+              class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all resize-none placeholder:text-gray-400"
               required
             ></textarea>
           </div>
@@ -44,9 +48,11 @@
           <button
             type="submit"
             :disabled="loading || !newPrompt || !title"
-            class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span v-if="!loading">💾 Save Prompt</span>
+            <span v-if="!loading" class="flex items-center justify-center gap-2">
+              💾 Save Prompt
+            </span>
             <span v-else class="flex items-center justify-center gap-2">
               <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -59,84 +65,84 @@
 
         <!-- Success/Error Messages -->
         <transition name="fade">
-          <div v-if="message" :class="messageClass" class="mt-4 p-4 rounded-lg">
+          <div v-if="message" :class="messageClass" class="mt-4 p-4 rounded-md">
             {{ message }}
           </div>
         </transition>
       </div>
 
       <!-- Stats -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
-          <div class="text-4xl font-bold">{{ prompts.length }}</div>
-          <div class="text-blue-100 text-sm mt-1">Total Prompts</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div class="bg-card text-card-foreground rounded-xl border-2 border-green-200 p-8 bg-white/80 backdrop-blur-sm shadow-lg">
+          <div class="text-4xl font-bold text-green-800 mb-2">{{ prompts.length }}</div>
+          <div class="text-gray-600">Total Prompts</div>
         </div>
-        <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
-          <div class="text-4xl font-bold">{{ recentCount }}</div>
-          <div class="text-indigo-100 text-sm mt-1">Added Today</div>
+        <div class="bg-card text-card-foreground rounded-xl border-2 border-green-200 p-8 bg-white/80 backdrop-blur-sm shadow-lg">
+          <div class="text-4xl font-bold text-green-800 mb-2">{{ recentCount }}</div>
+          <div class="text-gray-600">Added Today</div>
         </div>
       </div>
 
       <!-- Prompts History -->
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+      <div class="mb-8">
+        <h2 class="text-3xl text-green-800 mb-4 flex items-center gap-2">
           📚 Prompts History
-          <span class="text-sm font-normal text-slate-500 dark:text-slate-400">({{ prompts.length }})</span>
+          <span class="text-sm font-normal text-gray-600">({{ prompts.length }})</span>
         </h2>
       </div>
 
       <!-- Loading State -->
-      <div v-if="loadingPrompts" class="text-center py-12">
-        <svg class="animate-spin h-12 w-12 mx-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <div v-if="loadingPrompts" class="text-center py-16">
+        <svg class="animate-spin h-12 w-12 mx-auto text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <p class="text-slate-600 dark:text-slate-400 mt-4">Loading prompts...</p>
+        <p class="text-gray-600 mt-4">Loading prompts...</p>
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="prompts.length === 0" class="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600">
+      <div v-else-if="prompts.length === 0" class="text-center py-16 bg-white rounded-xl border-2 border-dashed border-gray-200">
         <div class="text-6xl mb-4">📝</div>
-        <h3 class="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
+        <h3 class="text-xl text-gray-900 mb-2">
           No prompts yet
         </h3>
-        <p class="text-slate-500 dark:text-slate-400">
+        <p class="text-gray-600 leading-relaxed">
           Create your first prompt using the form above!
         </p>
       </div>
 
       <!-- Prompts Grid -->
-      <div v-else class="grid grid-cols-1 gap-4">
+      <div v-else class="grid grid-cols-1 gap-6">
         <transition-group name="list">
           <div
             v-for="prompt in prompts"
             :key="prompt.id"
-            class="bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-slate-200 dark:border-slate-700 group"
+            class="bg-card text-card-foreground rounded-xl border-2 border-green-200 hover:border-green-300 transition-all duration-300 p-8 shadow-lg group bg-white/80 backdrop-blur-sm"
           >
-            <div class="flex items-start justify-between mb-3">
+            <div class="flex items-start justify-between mb-4">
               <div class="flex-1">
-                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                <h3 class="text-xl text-gray-900 flex items-center gap-2">
                   💬 {{ prompt.title }}
                 </h3>
               </div>
               <button
                 @click="deletePrompt(prompt.id)"
-                class="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg flex-shrink-0"
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-md flex-shrink-0"
                 title="Delete"
               >
                 🗑️
               </button>
             </div>
 
-            <p class="text-slate-700 dark:text-slate-300 mb-4 leading-relaxed whitespace-pre-wrap">
+            <p class="text-gray-700 mb-4 leading-relaxed whitespace-pre-wrap">
               {{ prompt.prompt }}
             </p>
 
-            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+            <div class="flex items-center justify-between text-xs text-gray-500 pt-4 border-t border-gray-200">
               <span class="flex items-center gap-1">
                 🕒 {{ formatDate(prompt.created_at) }}
               </span>
-              <span class="font-mono text-slate-400 dark:text-slate-500">
+              <span class="font-mono text-gray-400">
                 ID: {{ prompt.id }}
               </span>
             </div>
@@ -167,8 +173,8 @@ const message = ref('')
 const messageType = ref<'success' | 'error'>('success')
 
 const messageClass = computed(() => ({
-  'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border border-green-300 dark:border-green-700': messageType.value === 'success',
-  'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border border-red-300 dark:border-red-700': messageType.value === 'error'
+  'bg-green-100 text-green-800 border-2 border-green-200': messageType.value === 'success',
+  'bg-red-100 text-red-800 border-2 border-red-200': messageType.value === 'error'
 }))
 
 const recentCount = computed(() => {
