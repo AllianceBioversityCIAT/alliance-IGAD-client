@@ -13,6 +13,9 @@ id = "df7b708d27464714ae3a8545aa5b0585"
 [browser]
 binding = "MYBROWSER"
 
+[ai]
+binding = "AI"
+
 # # Opcional: overrides para PREVIEW
 # [[env.preview.kv_namespaces]]
 # binding = "astro"
