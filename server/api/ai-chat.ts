@@ -1,6 +1,8 @@
 export default defineEventHandler(async (event) => {
   // Check authentication
-  const db = event.context.cloudflare?.env?.DB
+  const env = event.context.cloudflare?.env
+  const db = env?.DB
+  const ai = env?.AI
   
   if (!db) {
     return {
@@ -44,6 +46,14 @@ export default defineEventHandler(async (event) => {
     return {
       success: false,
       error: "Session expired"
+    }
+  }
+
+  if (!ai) {
+    return {
+      success: false,
+      error: "AI binding not available",
+      message: "Make sure AI is configured in wrangler.toml"
     }
   }
 
@@ -115,19 +125,16 @@ Always answer as the IGAD Innovation Hub Guide:
       content: message
     })
 
-    // Call the AI API (using the existing /api/ai endpoint)
-    const aiResponse = await $fetch('/api/ai', {
-      method: 'POST',
-      body: {
-        messages,
-        temperature: 0.7,
-        max_tokens: 1000
-      }
+    // Call the AI directly
+    const aiResponse = await ai.run("@cf/meta/llama-4-scout-17b-16e-instruct", {
+      messages,
+      temperature: 0.7,
+      max_tokens: 1000
     })
 
     return {
       success: true,
-      response: aiResponse.response || aiResponse.message || "Lo siento, no pude generar una respuesta.",
+      response: aiResponse.response || "Lo siento, no pude generar una respuesta.",
       timestamp: new Date().toISOString()
     }
   } catch (error: any) {
