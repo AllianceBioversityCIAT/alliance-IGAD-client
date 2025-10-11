@@ -27,6 +27,8 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "@cloudflare/puppeteer": "^1.0.4"
+    "@cloudflare/puppeteer": "^1.0.4",
+    "nitro-cloudflare-dev": "^0.2.2",
+    "wrangler": "^4.42.2"
   }
 }

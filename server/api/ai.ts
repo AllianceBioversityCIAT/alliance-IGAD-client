@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   try {
     const messages = [
       { role: "system", content: "You are a friendly assistant" },
-      { role: "user", content: "Hello, how are you?" }
+      { role: "user", content: "Hello, how are you? my name is yecksin" }
     ]
 
     const response = await ai.run("@cf/meta/llama-4-scout-17b-16e-instruct", { 

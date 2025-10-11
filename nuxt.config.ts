@@ -12,7 +12,8 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/test-utils',
-    '@nuxt/ui'
+    '@nuxt/ui',
+    'nitro-cloudflare-dev'
   ],
   css: ['~/assets/css/main.css'],
   vite: {
