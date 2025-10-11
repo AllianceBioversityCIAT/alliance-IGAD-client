@@ -3,6 +3,9 @@ pages_build_output_dir = "./dist"     # carpeta que sube Pages
 compatibility_date = "2025-09-30"
 compatibility_flags = ["nodejs_compat"]
 
+[vars]
+MY_VARIABLE = "Yecksinr"
+
 [[kv_namespaces]]
 binding = "MY_KV"
 id = "df7b708d27464714ae3a8545aa5b0585"
