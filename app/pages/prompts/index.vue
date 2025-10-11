@@ -3,6 +3,15 @@
     <!-- Header -->
     <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-b border-green-100">
       <div class="container mx-auto px-4 py-12">
+        <div class="flex items-center justify-center mb-6">
+          <NuxtLink to="/" class="absolute left-4 inline-flex items-center gap-2 text-gray-600 hover:text-green-700 transition-colors px-4 py-2 rounded-md hover:bg-white/50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m12 19-7-7 7-7"></path>
+              <path d="M19 12H5"></path>
+            </svg>
+            Back to Home
+          </NuxtLink>
+        </div>
         <div class="text-center">
           <h1 class="text-4xl md:text-5xl mb-4 tracking-tight text-green-800">
             🤖 Prompts Management
@@ -74,16 +83,6 @@
 
       </div>
 
-      <!-- Back Button -->
-      <div class="mt-12 text-center">
-        <NuxtLink to="/" class="inline-flex items-center gap-2 text-gray-600 hover:text-green-700 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m12 19-7-7 7-7"></path>
-            <path d="M19 12H5"></path>
-          </svg>
-          Back to Home
-        </NuxtLink>
-      </div>
     </div>
   </div>
 </template>

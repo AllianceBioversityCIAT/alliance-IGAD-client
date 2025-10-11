@@ -44,4 +44,3 @@ CREATE INDEX idx_prompts_type ON prompts(type);
 CREATE INDEX idx_prompts_active ON prompts(type, is_active);
 CREATE INDEX idx_prompts_created_at ON prompts(created_at DESC);
 CREATE INDEX idx_sessions_expires ON sessions(expires_at);
-

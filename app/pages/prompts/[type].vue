@@ -3,6 +3,15 @@
     <!-- Header -->
     <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-b border-green-100">
       <div class="container mx-auto px-4 py-12">
+        <div class="flex items-center justify-center mb-6">
+          <NuxtLink to="/prompts" class="absolute left-4 inline-flex items-center gap-2 text-gray-600 hover:text-green-700 transition-colors px-4 py-2 rounded-md hover:bg-white/50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m12 19-7-7 7-7"></path>
+              <path d="M19 12H5"></path>
+            </svg>
+            Back
+          </NuxtLink>
+        </div>
         <div class="text-center">
           <h1 class="text-4xl md:text-5xl mb-4 tracking-tight text-green-800">
             {{ pageTitle }}
@@ -18,6 +27,9 @@
 
       <!-- Input Section -->
       <div class="mb-8 bg-card text-card-foreground rounded-xl border-2 border-green-200 p-8 shadow-lg bg-white/80 backdrop-blur-sm">
+        <h3 class="text-lg font-semibold text-gray-900 mb-6">
+          {{ editingId ? '✏️ Edit Prompt' : '➕ Create New Prompt' }}
+        </h3>
         <form @submit.prevent="savePrompt" class="space-y-6">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -45,22 +57,33 @@
             ></textarea>
           </div>
 
-          <button
-            type="submit"
-            :disabled="loading || !newPrompt || !title"
-            class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <span v-if="!loading" class="flex items-center justify-center gap-2">
-              💾 Save Prompt
-            </span>
-            <span v-else class="flex items-center justify-center gap-2">
-              <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Saving...
-            </span>
-          </button>
+          <div class="flex gap-3">
+            <button
+              v-if="editingId"
+              type="button"
+              @click="cancelEdit"
+              class="flex-1 px-4 py-3 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              :disabled="loading || !newPrompt || !title"
+              class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              :class="editingId ? 'flex-1' : 'w-full'"
+            >
+              <span v-if="!loading" class="flex items-center justify-center gap-2">
+                {{ editingId ? '💾 Update Prompt' : '💾 Save Prompt' }}
+              </span>
+              <span v-else class="flex items-center justify-center gap-2">
+                <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {{ editingId ? 'Updating...' : 'Saving...' }}
+              </span>
+            </button>
+          </div>
         </form>
 
         <!-- Success/Error Messages -->
@@ -141,6 +164,13 @@
               </div>
               <div class="flex gap-2 flex-shrink-0">
                 <button
+                  @click="editPrompt(prompt)"
+                  class="opacity-0 group-hover:opacity-100 transition-opacity bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  title="Edit"
+                >
+                  ✏️ Edit
+                </button>
+                <button
                   v-if="!prompt.is_active"
                   @click="activatePrompt(prompt.id)"
                   class="opacity-0 group-hover:opacity-100 transition-opacity bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
@@ -174,17 +204,6 @@
         </transition-group>
       </div>
 
-      <!-- Back Button -->
-      <div class="mt-12 text-center">
-        <NuxtLink to="/prompts" class="inline-flex items-center gap-2 text-gray-600 hover:text-green-700 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m12 19-7-7 7-7"></path>
-            <path d="M19 12H5"></path>
-          </svg>
-          Back to Prompts Selection
-        </NuxtLink>
-      </div>
-
     </div>
   </div>
 </template>
@@ -214,6 +233,7 @@ interface Prompt {
 const prompts = ref<Prompt[]>([])
 const title = ref('')
 const newPrompt = ref('')
+const editingId = ref<number | null>(null)
 const loading = ref(false)
 const loadingPrompts = ref(true)
 const message = ref('')
@@ -257,28 +277,55 @@ const savePrompt = async () => {
   message.value = ''
   
   try {
-    const data = await $fetch('/api/prompts/create', {
-      method: 'POST',
-      body: {
-        type: dbType.value,
-        title: title.value,
-        prompt: newPrompt.value
-      }
-    })
+    if (editingId.value) {
+      // Update existing prompt
+      const data = await $fetch('/api/prompts/update', {
+        method: 'POST',
+        body: {
+          id: editingId.value,
+          title: title.value,
+          prompt: newPrompt.value
+        }
+      })
 
-    if (data.success) {
-      messageType.value = 'success'
-      message.value = '✅ Prompt saved successfully'
-      title.value = ''
-      newPrompt.value = ''
-      await loadPrompts()
-      
-      setTimeout(() => {
-        message.value = ''
-      }, 3000)
+      if (data.success) {
+        messageType.value = 'success'
+        message.value = '✅ Prompt updated successfully'
+        cancelEdit()
+        await loadPrompts()
+        
+        setTimeout(() => {
+          message.value = ''
+        }, 3000)
+      } else {
+        messageType.value = 'error'
+        message.value = `❌ Error: ${data.error}`
+      }
     } else {
-      messageType.value = 'error'
-      message.value = `❌ Error: ${data.error}`
+      // Create new prompt
+      const data = await $fetch('/api/prompts/create', {
+        method: 'POST',
+        body: {
+          type: dbType.value,
+          title: title.value,
+          prompt: newPrompt.value
+        }
+      })
+
+      if (data.success) {
+        messageType.value = 'success'
+        message.value = '✅ Prompt saved successfully'
+        title.value = ''
+        newPrompt.value = ''
+        await loadPrompts()
+        
+        setTimeout(() => {
+          message.value = ''
+        }, 3000)
+      } else {
+        messageType.value = 'error'
+        message.value = `❌ Error: ${data.error}`
+      }
     }
   } catch (error: any) {
     messageType.value = 'error'
@@ -286,6 +333,21 @@ const savePrompt = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const editPrompt = (prompt: Prompt) => {
+  editingId.value = prompt.id
+  title.value = prompt.title
+  newPrompt.value = prompt.prompt
+  
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+const cancelEdit = () => {
+  editingId.value = null
+  title.value = ''
+  newPrompt.value = ''
 }
 
 const activatePrompt = async (id: number) => {
