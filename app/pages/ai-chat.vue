@@ -282,8 +282,12 @@ const logout = async () => {
   try {
     await $fetch('/api/auth/logout')
     user.value = null
+    // Redirect to home page after logout
+    navigateTo('/')
   } catch (error) {
     console.error('Error logging out:', error)
+    // Redirect even if there's an error
+    navigateTo('/')
   }
 }
 
