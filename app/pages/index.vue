@@ -14,23 +14,23 @@
                 Web Scraping
               </NuxtLink>
               <NuxtLink to="/ai-chat" class="text-gray-600 hover:text-green-600 transition-colors">
-                Chat con IA
+                AI Chat
               </NuxtLink>
             </nav>
           </div>
           
           <div class="flex items-center gap-4">
             <template v-if="user">
-              <span class="text-gray-600">Hola, <strong>{{ user.name }}</strong></span>
+              <span class="text-gray-600">Hello, <strong>{{ user.name }}</strong></span>
               <NuxtLink to="/prompts" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
-                Gestionar Prompts
+                Manage Prompts
               </NuxtLink>
               <button @click="logout" class="px-4 py-2 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors">
-                Cerrar Sesión
+                Logout
               </button>
             </template>
             <button v-else @click="showLoginModal = true" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
-              Iniciar Sesión
+              Login
             </button>
           </div>
         </div>
@@ -40,25 +40,25 @@
     <!-- Login Modal -->
     <div v-if="showLoginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Iniciar Sesión en IGAD AI Hub</h2>
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Login to IGAD AI Hub</h2>
         <form @submit.prevent="login" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
             <input
               v-model="loginEmail"
               type="email"
-              placeholder="Ingresa tu correo..."
+              placeholder="Enter your email..."
               class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
               required
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <input
               v-model="loginPassword"
               type="password"
-              placeholder="Ingresa tu contraseña..."
+              placeholder="Enter your password..."
               class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
               required
             />
@@ -74,14 +74,14 @@
               @click="showLoginModal = false"
               class="flex-1 px-4 py-3 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors"
             >
-              Cancelar
+              Cancel
             </button>
             <button
               type="submit"
               :disabled="loginLoading"
               class="flex-1 px-4 py-3 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors disabled:opacity-50"
             >
-              {{ loginLoading ? 'Cargando...' : 'Iniciar Sesión' }}
+              {{ loginLoading ? 'Loading...' : 'Login' }}
             </button>
           </div>
         </form>

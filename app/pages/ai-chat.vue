@@ -14,23 +14,23 @@
                 Web Scraping
               </NuxtLink>
               <NuxtLink to="/ai-chat" class="text-green-600 font-medium">
-                Chat con IA
+                AI Chat
               </NuxtLink>
             </nav>
           </div>
           
           <div class="flex items-center gap-4">
             <template v-if="user">
-              <span class="text-gray-600">Hola, <strong>{{ user.name }}</strong></span>
+              <span class="text-gray-600">Hello, <strong>{{ user.name }}</strong></span>
               <NuxtLink to="/prompts" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
-                Gestionar Prompts
+                Manage Prompts
               </NuxtLink>
               <button @click="logout" class="px-4 py-2 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors">
-                Cerrar Sesión
+                Logout
               </button>
             </template>
             <button v-else @click="showLoginModal = true" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
-              Iniciar Sesión
+              Login
             </button>
           </div>
         </div>
@@ -40,25 +40,25 @@
     <!-- Login Modal -->
     <div v-if="showLoginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Iniciar Sesión</h2>
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Login to IGAD AI Hub</h2>
         <form @submit.prevent="login" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
             <input
               v-model="loginEmail"
               type="email"
-              placeholder="Ingresa tu correo..."
+              placeholder="Enter your email..."
               class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
               required
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <input
               v-model="loginPassword"
               type="password"
-              placeholder="Ingresa tu contraseña..."
+              placeholder="Enter your password..."
               class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
               required
             />
@@ -74,14 +74,14 @@
               @click="showLoginModal = false"
               class="flex-1 px-4 py-3 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors"
             >
-              Cancelar
+              Cancel
             </button>
             <button
               type="submit"
               :disabled="loginLoading"
               class="flex-1 px-4 py-3 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors disabled:opacity-50"
             >
-              {{ loginLoading ? 'Cargando...' : 'Iniciar Sesión' }}
+              {{ loginLoading ? 'Loading...' : 'Login' }}
             </button>
           </div>
         </form>
@@ -100,8 +100,8 @@
               </svg>
             </div>
             <div>
-              <h1 class="text-2xl font-bold">Chat con IA - IGAD</h1>
-              <p class="text-purple-100 text-sm">Asistente especializado en agricultura y desarrollo rural</p>
+              <h1 class="text-2xl font-bold">AI Chat - IGAD</h1>
+              <p class="text-purple-100 text-sm">Specialized assistant in agriculture and rural development</p>
             </div>
           </div>
         </div>
@@ -113,14 +113,14 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-purple-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
-            <h3 class="text-xl font-semibold text-gray-700 mb-2">¡Bienvenido al Chat con IA!</h3>
-            <p class="text-gray-500">Comienza una conversación escribiendo un mensaje abajo</p>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Welcome to AI Chat!</h3>
+            <p class="text-gray-500">Start a conversation by writing a message below</p>
             <div class="mt-6 max-w-md mx-auto text-left">
-              <p class="text-sm text-gray-600 mb-2 font-medium">Ejemplos de preguntas:</p>
+              <p class="text-sm text-gray-600 mb-2 font-medium">Example questions:</p>
               <ul class="text-sm text-gray-500 space-y-1">
-                <li>• ¿Cuáles son las mejores prácticas para la agricultura sostenible?</li>
-                <li>• ¿Cómo afecta el cambio climático a la región de IGAD?</li>
-                <li>• Dame información sobre políticas agrícolas en África Oriental</li>
+                <li>• What are the best practices for sustainable agriculture?</li>
+                <li>• How does climate change affect the IGAD region?</li>
+                <li>• Give me information about agricultural policies in East Africa</li>
               </ul>
             </div>
           </div>
@@ -182,7 +182,7 @@
             <input
               v-model="currentMessage"
               type="text"
-              placeholder="Escribe tu mensaje aquí..."
+              placeholder="Write your message here..."
               class="flex-1 px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
               :disabled="isLoading"
             />
@@ -201,13 +201,13 @@
             </button>
           </form>
           <div class="flex items-center justify-between mt-2">
-            <p class="text-xs text-gray-500">Presiona Enter para enviar</p>
+            <p class="text-xs text-gray-500">Press Enter to send</p>
             <button
               v-if="messages.length > 0"
               @click="clearChat"
               class="text-xs text-red-600 hover:text-red-700 font-medium"
             >
-              Limpiar Chat
+              Clear Chat
             </button>
           </div>
         </div>
@@ -265,10 +265,10 @@ const login = async () => {
       loginEmail.value = ''
       loginPassword.value = ''
     } else {
-      loginError.value = data.error || 'Error al iniciar sesión'
+      loginError.value = data.error || 'Login failed'
     }
   } catch (error: any) {
-    loginError.value = error.message || 'Error al iniciar sesión'
+    loginError.value = error.message || 'Login failed'
   } finally {
     loginLoading.value = false
   }
@@ -325,7 +325,7 @@ const sendMessage = async () => {
     } else {
       const errorMessage: Message = {
         role: 'assistant',
-        content: `Error: ${response.error || 'No se pudo obtener respuesta'}`,
+        content: `Error: ${response.error || 'Unable to get response'}`,
         timestamp: new Date().toISOString()
       }
       messages.value.push(errorMessage)
@@ -333,7 +333,7 @@ const sendMessage = async () => {
   } catch (error: any) {
     const errorMessage: Message = {
       role: 'assistant',
-      content: `Error: ${error.message || 'Error de conexión con la IA'}`,
+      content: `Error: ${error.message || 'AI connection error'}`,
       timestamp: new Date().toISOString()
     }
     messages.value.push(errorMessage)
@@ -346,7 +346,7 @@ const sendMessage = async () => {
 }
 
 const clearChat = () => {
-  if (confirm('¿Estás seguro de que quieres limpiar el chat?')) {
+  if (confirm('Are you sure you want to clear the chat?')) {
     messages.value = []
   }
 }

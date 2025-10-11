@@ -5,8 +5,8 @@ export default defineEventHandler(async (event) => {
   if (!ai) {
     return { 
       success: false,
-      error: "AI binding no disponible",
-      message: "Asegúrate de que AI esté configurado en wrangler.toml"
+      error: "AI binding not available",
+      message: "Make sure AI is configured in wrangler.toml"
     }
   }
 
@@ -14,10 +14,10 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const { messages, temperature, max_tokens } = body
 
-    // Mensajes por defecto si no se proporcionan
+    // Default messages if none provided
     const messagesToUse = messages || [
-      { role: "system", content: "Eres un asistente amigable" },
-      { role: "user", content: "Hola, ¿cómo estás?" }
+      { role: "system", content: "You are a friendly assistant" },
+      { role: "user", content: "Hello, how are you?" }
     ]
 
     const response = await ai.run("@cf/meta/llama-4-scout-17b-16e-instruct", { 
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
   } catch (error) {
     return {
       success: false,
-      error: "Error al ejecutar Workers AI",
+      error: "Error executing Workers AI",
       message: error instanceof Error ? error.message : String(error)
     }
   }

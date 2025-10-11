@@ -14,23 +14,23 @@
                 Web Scraping
               </NuxtLink>
               <NuxtLink to="/ai-chat" class="text-gray-600 hover:text-green-600 transition-colors">
-                Chat con IA
+                AI Chat
               </NuxtLink>
             </nav>
           </div>
           
           <div class="flex items-center gap-4">
             <template v-if="user">
-              <span class="text-gray-600">Hola, <strong>{{ user.name }}</strong></span>
+              <span class="text-gray-600">Hello, <strong>{{ user.name }}</strong></span>
               <NuxtLink to="/prompts" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
-                Gestionar Prompts
+                Manage Prompts
               </NuxtLink>
               <button @click="logout" class="px-4 py-2 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors">
-                Cerrar Sesión
+                Logout
               </button>
             </template>
             <button v-else @click="showLoginModal = true" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
-              Iniciar Sesión
+              Login
             </button>
           </div>
         </div>
@@ -40,25 +40,25 @@
     <!-- Login Modal -->
     <div v-if="showLoginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Iniciar Sesión</h2>
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Login to IGAD AI Hub</h2>
         <form @submit.prevent="login" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
             <input
               v-model="loginEmail"
               type="email"
-              placeholder="Ingresa tu correo..."
+              placeholder="Enter your email..."
               class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
               required
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <input
               v-model="loginPassword"
               type="password"
-              placeholder="Ingresa tu contraseña..."
+              placeholder="Enter your password..."
               class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
               required
             />
@@ -74,14 +74,14 @@
               @click="showLoginModal = false"
               class="flex-1 px-4 py-3 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors"
             >
-              Cancelar
+              Cancel
             </button>
             <button
               type="submit"
               :disabled="loginLoading"
               class="flex-1 px-4 py-3 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors disabled:opacity-50"
             >
-              {{ loginLoading ? 'Cargando...' : 'Iniciar Sesión' }}
+              {{ loginLoading ? 'Loading...' : 'Login' }}
             </button>
           </div>
         </form>
@@ -92,24 +92,24 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Action Section -->
       <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Extraer Publicaciones</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Extract Publications</h2>
         
         <!-- URL Input -->
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">URL a Scrapear</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">URL to Scrape</label>
           <input
             v-model="targetUrl"
             type="text"
             placeholder="https://www.fao.org/pastoralist-knowledge-hub/knowledge-repository/publications/en"
             class="w-full px-4 py-2 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
           />
-          <p class="text-xs text-gray-500 mt-1">Puedes cambiar la URL para scrapear diferentes páginas</p>
+          <p class="text-xs text-gray-500 mt-1">You can change the URL to scrape different pages</p>
         </div>
 
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-600">
-              Haz clic en el botón para scrapear las últimas publicaciones de FAO
+              Click the button to scrape the latest FAO publications
             </p>
           </div>
           <button
@@ -122,9 +122,9 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Haciendo web scraping...
+              Scraping publications...
             </span>
-            <span v-else>Hacer Web Scraping</span>
+            <span v-else>Start Web Scraping</span>
           </button>
         </div>
 
@@ -135,7 +135,7 @@
 
         <!-- Current URL Display -->
         <div v-if="scrapedUrl" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <p class="text-xs text-gray-600 font-medium mb-1">URL Scrapeada:</p>
+          <p class="text-xs text-gray-600 font-medium mb-1">Scraped URL:</p>
           <p class="text-sm text-blue-800 break-all">{{ scrapedUrl }}</p>
         </div>
       </div>
@@ -146,12 +146,12 @@
         <div class="lg:col-span-1">
           <div class="bg-gray-900 rounded-lg shadow-lg p-4 sticky top-24">
             <div class="flex items-center justify-between mb-3">
-              <h3 class="text-white font-semibold">Respuesta JSON</h3>
+              <h3 class="text-white font-semibold">JSON Response</h3>
               <button
                 @click="copyJson"
                 class="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition-colors"
               >
-                {{ jsonCopied ? '✓ Copiado' : 'Copiar' }}
+                {{ jsonCopied ? '✓ Copied' : 'Copy' }}
               </button>
             </div>
             <pre class="text-green-400 text-xs overflow-auto max-h-[600px] font-mono">{{ jsonData }}</pre>
@@ -162,7 +162,7 @@
         <div class="lg:col-span-2 space-y-4">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-bold text-gray-900">
-              Resultados ({{ publications.length }} publicaciones encontradas)
+              Results ({{ publications.length }} publications found)
             </h2>
           </div>
 
@@ -217,7 +217,7 @@
                     rel="noopener noreferrer"
                     class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                   >
-                    Ver Publicación
+                    View Publication
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
@@ -254,8 +254,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
               <div>
-                <h3 class="font-bold text-sm">Consulta sobre Publicaciones</h3>
-                <p class="text-xs text-purple-100">{{ publications.length }} publicaciones cargadas</p>
+                <h3 class="font-bold text-sm">Publications Query</h3>
+                <p class="text-xs text-purple-100">{{ publications.length }} publications loaded</p>
               </div>
             </div>
             <button
@@ -275,9 +275,9 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-purple-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
-              <p class="text-sm text-gray-600 font-medium mb-2">¡Pregunta sobre las publicaciones!</p>
+              <p class="text-sm text-gray-600 font-medium mb-2">Ask about the publications!</p>
               <p class="text-xs text-gray-500 px-4">
-                Puedo responder preguntas basadas en los títulos y descripciones de las {{ publications.length }} publicaciones scrapeadas.
+                I can answer questions based on the titles and descriptions of the {{ publications.length }} scraped publications.
               </p>
             </div>
 
@@ -314,7 +314,7 @@
               <input
                 v-model="chatInput"
                 type="text"
-                placeholder="Pregunta sobre las publicaciones..."
+                placeholder="Ask about the publications..."
                 class="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all text-sm"
                 :disabled="chatLoading"
               />
@@ -337,7 +337,7 @@
               @click="clearChatMessages"
               class="text-xs text-red-600 hover:text-red-700 font-medium mt-2"
             >
-              Limpiar conversación
+              Clear conversation
             </button>
           </div>
         </div>
@@ -358,9 +358,9 @@
             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
           />
         </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">No hay publicaciones aún</h3>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No publications yet</h3>
         <p class="mt-1 text-sm text-gray-500">
-          Haz clic en el botón de arriba para comenzar a scrapear publicaciones
+          Click the button above to start scraping publications
         </p>
       </div>
     </main>
@@ -434,10 +434,10 @@ const login = async () => {
       loginEmail.value = ''
       loginPassword.value = ''
     } else {
-      loginError.value = data.error || 'Error al iniciar sesión'
+      loginError.value = data.error || 'Login failed'
     }
   } catch (error: any) {
-    loginError.value = error.message || 'Error al iniciar sesión'
+    loginError.value = error.message || 'Login failed'
   } finally {
     loginLoading.value = false
   }
@@ -474,10 +474,10 @@ const scrapePublications = async () => {
       scrapedUrl.value = response.url
       jsonData.value = JSON.stringify(response, null, 2)
     } else {
-      error.value = response.error || 'Error al scrapear las publicaciones'
+      error.value = response.error || 'Failed to scrape publications'
     }
   } catch (err: any) {
-    error.value = err.message || 'Ocurrió un error inesperado'
+    error.value = err.message || 'An unexpected error occurred'
     console.error('Scraping error:', err)
   } finally {
     loading.value = false
@@ -543,7 +543,7 @@ const sendChatMessage = async () => {
     } else {
       const errorMessage: ChatMessage = {
         role: 'assistant',
-        content: `Error: ${response.error || 'No se pudo obtener respuesta'}`,
+        content: `Error: ${response.error || 'Unable to get response'}`,
         timestamp: new Date().toISOString()
       }
       chatMessages.value.push(errorMessage)
@@ -551,7 +551,7 @@ const sendChatMessage = async () => {
   } catch (error: any) {
     const errorMessage: ChatMessage = {
       role: 'assistant',
-      content: `Error: ${error.message || 'Error de conexión con la IA'}`,
+      content: `Error: ${error.message || 'AI connection error'}`,
       timestamp: new Date().toISOString()
     }
     chatMessages.value.push(errorMessage)
@@ -564,7 +564,7 @@ const sendChatMessage = async () => {
 }
 
 const clearChatMessages = () => {
-  if (confirm('¿Estás seguro de que quieres limpiar la conversación?')) {
+  if (confirm('Are you sure you want to clear the conversation?')) {
     chatMessages.value = []
   }
 }

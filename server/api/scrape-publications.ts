@@ -7,8 +7,8 @@ export default defineEventHandler(async (event) => {
   if (!browserBinding) {
     return { 
       success: false,
-      error: "Browser binding no disponible",
-      message: "Asegúrate de que MYBROWSER esté configurado en wrangler.toml"
+      error: "Browser binding not available",
+      message: "Make sure MYBROWSER is configured in wrangler.toml"
     }
   }
 
@@ -19,16 +19,16 @@ export default defineEventHandler(async (event) => {
     const browser = await puppeteer.launch(browserBinding)
     const page = await browser.newPage()
     
-    // Navegar a la URL especificada
+    // Navigate to the specified URL
     await page.goto(targetUrl, { 
       waitUntil: "networkidle0",
       timeout: 30000
     })
     
-    // Esperar a que se carguen los resultados
+    // Wait for results to load
     await page.waitForSelector('#search-results-holder', { timeout: 10000 })
     
-    // Extraer datos de las publicaciones
+    // Extract publication data
     const publications = await page.evaluate(() => {
       const items = document.querySelectorAll('#search-results-holder .d-list.d-list-publication')
       const results: Array<{
@@ -40,20 +40,20 @@ export default defineEventHandler(async (event) => {
       }> = []
       
       items.forEach((item) => {
-        // Extraer imagen
+        // Extract image
         const imageElement = item.querySelector('.d-list-visual img')
         const image = imageElement?.getAttribute('src') || ''
         
-        // Extraer título y URL
+        // Extract title and URL
         const titleElement = item.querySelector('.title-link a')
         const title = titleElement?.textContent?.trim() || ''
         const url = titleElement?.getAttribute('href') || ''
         
-        // Extraer fecha
+        // Extract date
         const dateElement = item.querySelector('.date')
         const date = dateElement?.textContent?.trim() || ''
         
-        // Extraer descripción
+        // Extract description
         const descElement = item.querySelector('.d-list-content > p')
         const description = descElement?.textContent?.trim() || ''
         
@@ -76,7 +76,7 @@ export default defineEventHandler(async (event) => {
   } catch (error) {
     return {
       success: false,
-      error: "Error durante el scraping",
+      error: "Error while scraping",
       message: error instanceof Error ? error.message : String(error)
     }
   }
