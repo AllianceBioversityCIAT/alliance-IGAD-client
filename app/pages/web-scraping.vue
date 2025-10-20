@@ -141,12 +141,13 @@
       </div>
 
       <!-- Results Section -->
-      <div v-if="publications.length > 0" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- JSON Display (Left Side) -->
-        <div class="lg:col-span-1">
-          <div class="bg-gray-900 rounded-lg shadow-lg p-4 sticky top-24">
+      <div v-if="classifiedPublications.length > 0" class="space-y-6">
+        <!-- JSON Display Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Basic JSON Display -->
+          <div class="bg-gray-900 rounded-lg shadow-lg p-4">
             <div class="flex items-center justify-between mb-3">
-              <h3 class="text-white font-semibold">JSON Response</h3>
+              <h3 class="text-white font-semibold">Basic Scraping JSON</h3>
               <button
                 @click="copyJson"
                 class="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition-colors"
@@ -154,83 +155,169 @@
                 {{ jsonCopied ? '✓ Copied' : 'Copy' }}
               </button>
             </div>
-            <pre class="text-green-400 text-xs overflow-auto max-h-[600px] font-mono">{{ jsonData }}</pre>
+            <pre class="text-green-400 text-xs overflow-auto max-h-[400px] font-mono">{{ jsonData }}</pre>
+          </div>
+
+          <!-- AI Classified JSON Display -->
+          <div class="bg-purple-900 rounded-lg shadow-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-white font-semibold flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                AI Classified JSON
+              </h3>
+              <button
+                @click="copyClassifiedJson"
+                class="px-3 py-1 bg-purple-700 hover:bg-purple-600 text-white text-xs rounded transition-colors"
+              >
+                {{ classifiedJsonCopied ? '✓ Copied' : 'Copy' }}
+              </button>
+            </div>
+            <pre class="text-purple-200 text-xs overflow-auto max-h-[400px] font-mono">{{ classifiedJsonData }}</pre>
           </div>
         </div>
 
-        <!-- Publications List (Right Side) -->
-        <div class="lg:col-span-2 space-y-4">
+        <!-- AI Classified Publications List -->
+        <div class="space-y-4">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold text-gray-900">
-              Results ({{ publications.length }} publications found)
+            <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+              AI Classified Publications ({{ classifiedPublications.length }} articles analyzed)
             </h2>
           </div>
 
           <div
-            v-for="(pub, index) in publications"
+            v-for="(pub, index) in classifiedPublications"
             :key="index"
-            class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-100 overflow-hidden"
+            class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border-2 border-purple-100 overflow-hidden"
           >
-            <div class="flex gap-4 p-6">
-              <!-- Image -->
-              <div v-if="pub.image" class="flex-shrink-0">
-                <img 
-                  :src="pub.image" 
-                  :alt="pub.title"
-                  class="w-32 h-32 object-cover rounded-lg"
-                  @error="(e) => e.target.style.display = 'none'"
-                />
-              </div>
-
-              <!-- Content -->
-              <div class="flex-1">
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            <div class="p-6">
+              <!-- Header with AI Badge -->
+              <div class="flex items-start justify-between mb-3">
+                <h3 class="text-lg font-semibold text-gray-900 flex-1">
                   <a
                     v-if="pub.url"
                     :href="pub.url"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="hover:text-blue-600 transition-colors"
+                    class="hover:text-purple-600 transition-colors"
                   >
                     {{ pub.title }}
                   </a>
                   <span v-else>{{ pub.title }}</span>
                 </h3>
-                
-                <div class="flex items-center gap-2 mb-3">
-                  <span v-if="pub.date" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    {{ pub.date }}
-                  </span>
-                </div>
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 ml-3 flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  AI Classified
+                </span>
+              </div>
 
-                <p v-if="pub.description" class="text-gray-600 text-sm leading-relaxed mb-3">
-                  {{ pub.description }}
-                </p>
+              <!-- Author -->
+              <div class="flex items-center gap-2 mb-3">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  {{ pub.author }}
+                </span>
+              </div>
 
-                <div v-if="pub.url" class="flex gap-2">
-                  <a
-                    :href="pub.url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              <!-- Description -->
+              <p class="text-gray-700 text-sm leading-relaxed mb-4">
+                {{ pub.description }}
+              </p>
+
+              <!-- Tags -->
+              <div v-if="pub.tags && pub.tags.length > 0" class="flex flex-wrap gap-2 mb-4">
+                <span
+                  v-for="(tag, tagIndex) in pub.tags"
+                  :key="tagIndex"
+                  class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800"
+                >
+                  #{{ tag }}
+                </span>
+              </div>
+
+              <!-- Actions -->
+              <div v-if="pub.url" class="flex gap-2">
+                <a
+                  :href="pub.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                >
+                  View Publication
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+
+              <!-- Related URLs -->
+              <div v-if="pub.relatedUrls && pub.relatedUrls.length > 0" class="mt-4 pt-4 border-t border-gray-200">
+                <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                  URLs Relacionadas Identificadas por IA
+                </h4>
+                <ul class="space-y-2">
+                  <li
+                    v-for="(relUrl, urlIndex) in pub.relatedUrls"
+                    :key="urlIndex"
+                    class="flex items-start gap-2"
                   >
-                    View Publication
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <span class="text-purple-600 text-xs mt-1">{{ urlIndex + 1 }}.</span>
+                    <a
+                      :href="relUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-xs text-blue-600 hover:text-blue-800 hover:underline break-all flex-1"
+                    >
+                      {{ relUrl }}
+                    </a>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-gray-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
-                  </a>
-                </div>
+                  </li>
+                </ul>
               </div>
+
+              <!-- Full Content (Collapsible) -->
+              <details v-if="pub.fullContent" class="mt-4">
+                <summary class="text-xs text-gray-500 cursor-pointer hover:text-purple-600 font-medium flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Ver contenido completo ({{ pub.fullContent.length.toLocaleString() }} caracteres)
+                </summary>
+                <div class="mt-3 p-4 bg-gray-50 rounded border border-gray-200 max-h-96 overflow-auto">
+                  <div class="prose prose-sm max-w-none">
+                    <pre class="whitespace-pre-wrap text-xs text-gray-700 font-sans">{{ pub.fullContent }}</pre>
+                  </div>
+                  <button
+                    @click="copyFullContent(pub.fullContent)"
+                    class="mt-3 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded transition-colors flex items-center gap-1"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Copiar contenido completo
+                  </button>
+                </div>
+              </details>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Floating Chat Button & Chat Window -->
-      <div v-if="publications.length > 0" class="fixed bottom-6 right-6 z-50">
+      <div v-if="classifiedPublications.length > 0" class="fixed bottom-6 right-6 z-50">
         <!-- Chat Button -->
         <button
           v-if="!chatOpen"
@@ -255,7 +342,7 @@
               </svg>
               <div>
                 <h3 class="font-bold text-sm">Publications Query</h3>
-                <p class="text-xs text-purple-100">{{ publications.length }} publications loaded</p>
+                <p class="text-xs text-purple-100">{{ classifiedPublications.length }} publications loaded</p>
               </div>
             </div>
             <button
@@ -277,7 +364,7 @@
               </svg>
               <p class="text-sm text-gray-600 font-medium mb-2">Ask about the publications!</p>
               <p class="text-xs text-gray-500 px-4">
-                I can answer questions based on the titles and descriptions of the {{ publications.length }} scraped publications.
+                I can answer questions based on the titles and descriptions of the {{ classifiedPublications.length }} scraped publications.
               </p>
             </div>
 
@@ -380,6 +467,17 @@ interface Publication {
   image: string
 }
 
+interface ClassifiedPublication {
+  title: string
+  description: string
+  tags: string[]
+  author: string
+  url: string
+  fullContent: string // Contenido completo sin resumir
+  contentPreview: string // Preview corto
+  relatedUrls: string[]
+}
+
 interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
@@ -394,12 +492,15 @@ const loginError = ref('')
 const loginLoading = ref(false)
 
 const publications = ref<Publication[]>([])
+const classifiedPublications = ref<ClassifiedPublication[]>([])
 const loading = ref(false)
 const error = ref('')
 const targetUrl = ref('https://www.fao.org/pastoralist-knowledge-hub/knowledge-repository/publications/en')
 const scrapedUrl = ref('')
 const jsonData = ref('')
+const classifiedJsonData = ref('')
 const jsonCopied = ref(false)
+const classifiedJsonCopied = ref(false)
 
 // Chat states
 const chatOpen = ref(false)
@@ -410,7 +511,7 @@ const chatMessagesContainer = ref<HTMLElement | null>(null)
 
 const checkAuth = async () => {
   try {
-    const auth = await $fetch('/api/auth/me')
+    const auth: any = await $fetch('/api/auth/me')
     if (auth.authenticated) {
       user.value = auth.user
     }
@@ -424,7 +525,7 @@ const login = async () => {
   loginError.value = ''
   
   try {
-    const data = await $fetch('/api/auth/login', {
+    const data: any = await $fetch('/api/auth/login', {
       method: 'POST',
       body: { 
         email: loginEmail.value,
@@ -464,23 +565,27 @@ const scrapePublications = async () => {
   loading.value = true
   error.value = ''
   publications.value = []
+  classifiedPublications.value = []
   jsonData.value = ''
+  classifiedJsonData.value = ''
   scrapedUrl.value = ''
   // Reset chat when scraping new publications
   chatMessages.value = []
   chatOpen.value = false
 
   try {
-    const response = await $fetch('/api/scrape-publications', {
+    const response: any = await $fetch('/api/scrape-publications', {
       params: {
         url: targetUrl.value
       }
     })
     
     if (response.success) {
-      publications.value = response.publications
+      publications.value = response.basicPublications || []
+      classifiedPublications.value = response.classifiedPublications || []
       scrapedUrl.value = response.url
-      jsonData.value = JSON.stringify(response, null, 2)
+      jsonData.value = JSON.stringify(response.basicPublications, null, 2)
+      classifiedJsonData.value = JSON.stringify(response.classifiedPublications, null, 2)
     } else {
       error.value = response.error || 'Failed to scrape publications'
     }
@@ -501,6 +606,28 @@ const copyJson = async () => {
     }, 2000)
   } catch (err) {
     console.error('Error copying to clipboard:', err)
+  }
+}
+
+const copyClassifiedJson = async () => {
+  try {
+    await navigator.clipboard.writeText(classifiedJsonData.value)
+    classifiedJsonCopied.value = true
+    setTimeout(() => {
+      classifiedJsonCopied.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('Error copying to clipboard:', err)
+  }
+}
+
+const copyFullContent = async (content: string) => {
+  try {
+    await navigator.clipboard.writeText(content)
+    alert('Contenido copiado al portapapeles!')
+  } catch (err) {
+    console.error('Error copying to clipboard:', err)
+    alert('Error al copiar el contenido')
   }
 }
 
@@ -527,14 +654,15 @@ const sendChatMessage = async () => {
     const history = chatMessages.value
       .map(m => ({ role: m.role, content: m.content }))
 
-    const response = await $fetch('/api/ai-publications-chat', {
+    const response: any = await $fetch('/api/ai-publications-chat', {
       method: 'POST',
       body: {
         message: messageToSend,
-        publications: publications.value.map(p => ({
+        publications: classifiedPublications.value.map(p => ({
           title: p.title,
-          date: p.date,
           description: p.description,
+          tags: p.tags,
+          author: p.author,
           url: p.url
         })),
         history: history.slice(0, -1) // Exclude the message we just added
