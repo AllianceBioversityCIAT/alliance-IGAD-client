@@ -6,23 +6,6 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Get session
-    const sessionId = getCookie(event, 'session_id')
-    if (!sessionId) {
-      return { success: false, error: "Not authenticated" }
-    }
-
-    // Get user from session
-    const { results: sessionResults } = await db.prepare(
-      "SELECT user_id FROM sessions WHERE id = ? AND expires_at > datetime('now')"
-    ).bind(sessionId).all()
-
-    if (sessionResults.length === 0) {
-      return { success: false, error: "Session expired" }
-    }
-
-    const userId = sessionResults[0].user_id
-
     // Get data from body
     const body = await readBody(event)
     const { id, title, prompt } = body
@@ -36,22 +19,14 @@ export default defineEventHandler(async (event) => {
 
     // Update prompt
     await db.prepare(
-      `UPDATE prompts 
-       SET title = ?, prompt = ?, updated_by = ?, updated_at = datetime('now')
+      `UPDATE prompts
+       SET title = ?, prompt = ?, updated_at = datetime('now')
        WHERE id = ?`
-    ).bind(title, prompt, userId, id).run()
+    ).bind(title, prompt, id).run()
 
-    // Get the updated record with user info
+    // Get the updated record
     const { results } = await db.prepare(`
-      SELECT p.*,
-        u1.name as created_by_name,
-        u1.email as created_by_email,
-        u2.name as updated_by_name,
-        u2.email as updated_by_email
-      FROM prompts p
-      JOIN users u1 ON p.created_by = u1.id
-      JOIN users u2 ON p.updated_by = u2.id
-      WHERE p.id = ?
+      SELECT * FROM prompts WHERE id = ?
     `).bind(id).all()
 
     return {

@@ -20,71 +20,20 @@
           </div>
           
           <div class="flex items-center gap-4">
-            <template v-if="user">
-              <span class="text-gray-600">Hello, <strong>{{ user.name }}</strong></span>
+            <template v-if="isLoggedIn">
+              <span class="text-gray-600">Hello, <strong>{{ userName }}</strong></span>
               <NuxtLink to="/prompts" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
                 Manage Prompts
               </NuxtLink>
-              <button @click="logout" class="px-4 py-2 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors">
+              <button @click="handleLogout" class="px-4 py-2 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors">
                 Logout
               </button>
             </template>
-            <button v-else @click="showLoginModal = true" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
+            <NuxtLink v-else to="/login" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
               Login
-            </button>
+            </NuxtLink>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Login Modal -->
-    <div v-if="showLoginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Login to IGAD AI Hub</h2>
-        <form @submit.prevent="login" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input
-              v-model="loginEmail"
-              type="email"
-              placeholder="Enter your email..."
-              class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
-              required
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <input
-              v-model="loginPassword"
-              type="password"
-              placeholder="Enter your password..."
-              class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
-              required
-            />
-          </div>
-          
-          <div v-if="loginError" class="p-3 bg-red-100 text-red-800 border-2 border-red-200 rounded-md text-sm">
-            {{ loginError }}
-          </div>
-          
-          <div class="flex gap-3">
-            <button
-              type="button"
-              @click="showLoginModal = false"
-              class="flex-1 px-4 py-3 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              :disabled="loginLoading"
-              class="flex-1 px-4 py-3 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors disabled:opacity-50"
-            >
-              {{ loginLoading ? 'Loading...' : 'Login' }}
-            </button>
-          </div>
-        </form>
       </div>
     </div>
 
@@ -131,7 +80,7 @@
               <!-- Avatar -->
               <div class="flex-shrink-0">
                 <div v-if="msg.role === 'user'" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                  {{ user?.name?.charAt(0).toUpperCase() || 'U' }}
+                  U
                 </div>
                 <div v-else class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -217,9 +166,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  middleware: 'auth'
-})
+const { isLoggedIn, userName, checkAuth, logout } = useAuth()
 
 interface Message {
   role: 'user' | 'assistant' | 'system'
@@ -227,68 +174,14 @@ interface Message {
   timestamp: string
 }
 
-const user = ref<any>(null)
-const showLoginModal = ref(false)
-const loginEmail = ref('')
-const loginPassword = ref('')
-const loginError = ref('')
-const loginLoading = ref(false)
-
 const messages = ref<Message[]>([])
 const currentMessage = ref('')
 const isLoading = ref(false)
 const messagesContainer = ref<HTMLElement | null>(null)
 
-const checkAuth = async () => {
-  try {
-    const auth = await $fetch('/api/auth/me')
-    if (auth.authenticated) {
-      user.value = auth.user
-    }
-  } catch (error) {
-    console.error('Error checking auth:', error)
-  }
-}
-
-const login = async () => {
-  loginLoading.value = true
-  loginError.value = ''
-  
-  try {
-    const data = await $fetch('/api/auth/login', {
-      method: 'POST',
-      body: { 
-        email: loginEmail.value,
-        password: loginPassword.value
-      }
-    })
-    
-    if (data.success) {
-      user.value = data.user
-      showLoginModal.value = false
-      loginEmail.value = ''
-      loginPassword.value = ''
-    } else {
-      loginError.value = data.error || 'Login failed'
-    }
-  } catch (error: any) {
-    loginError.value = error.message || 'Login failed'
-  } finally {
-    loginLoading.value = false
-  }
-}
-
-const logout = async () => {
-  try {
-    await $fetch('/api/auth/logout')
-    user.value = null
-    // Redirect to home page after logout
-    navigateTo('/')
-  } catch (error) {
-    console.error('Error logging out:', error)
-    // Redirect even if there's an error
-    navigateTo('/')
-  }
+const handleLogout = () => {
+  logout()
+  navigateTo('/')
 }
 
 const sendMessage = async () => {
@@ -370,12 +263,8 @@ const scrollToBottom = () => {
   }
 }
 
-onMounted(async () => {
-  await checkAuth()
-  // If not authenticated after check, redirect to home
-  if (!user.value) {
-    navigateTo('/')
-  }
+onMounted(() => {
+  checkAuth()
 })
 </script>
 

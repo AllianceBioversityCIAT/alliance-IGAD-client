@@ -9,7 +9,7 @@
               <img src="/igad-logo.png" alt="IGAD Logo" class="h-8 w-auto" />
               <span class="text-lg font-semibold text-green-800">IGAD AI Hub</span>
             </NuxtLink>
-            <nav v-if="user" class="flex items-center gap-4">
+            <nav class="flex items-center gap-4">
               <NuxtLink to="/web-scraping" class="text-gray-600 hover:text-green-600 transition-colors">
                 Web Scraping
               </NuxtLink>
@@ -20,71 +20,20 @@
           </div>
           
           <div class="flex items-center gap-4">
-            <template v-if="user">
-              <span class="text-gray-600">Hello, <strong>{{ user.name }}</strong></span>
+            <template v-if="isLoggedIn">
+              <span class="text-gray-600">Hello, <strong>{{ userName }}</strong></span>
               <NuxtLink to="/prompts" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
                 Manage Prompts
               </NuxtLink>
-              <button @click="logout" class="px-4 py-2 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors">
+              <button @click="handleLogout" class="px-4 py-2 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors">
                 Logout
               </button>
             </template>
-            <button v-else @click="showLoginModal = true" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
+            <NuxtLink v-else to="/login" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
               Login
-            </button>
+            </NuxtLink>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Login Modal -->
-    <div v-if="showLoginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Login to IGAD AI Hub</h2>
-        <form @submit.prevent="login" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input
-              v-model="loginEmail"
-              type="email"
-              placeholder="Enter your email..."
-              class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
-              required
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <input
-              v-model="loginPassword"
-              type="password"
-              placeholder="Enter your password..."
-              class="w-full px-4 py-3 rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
-              required
-            />
-          </div>
-          
-          <div v-if="loginError" class="p-3 bg-red-100 text-red-800 border-2 border-red-200 rounded-md text-sm">
-            {{ loginError }}
-          </div>
-          
-          <div class="flex gap-3">
-            <button
-              type="button"
-              @click="showLoginModal = false"
-              class="flex-1 px-4 py-3 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              :disabled="loginLoading"
-              class="flex-1 px-4 py-3 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors disabled:opacity-50"
-            >
-              {{ loginLoading ? 'Loading...' : 'Login' }}
-            </button>
-          </div>
-        </form>
       </div>
     </div>
 
@@ -253,8 +202,8 @@
           </div>
         </div>
 
-        <!-- Web Scraping - Requires Login -->
-        <NuxtLink v-if="user" to="/web-scraping" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl group relative overflow-hidden transition-all duration-300 hover:shadow-xl border-2 border-green-200 hover:border-green-300 cursor-pointer">
+        <!-- Web Scraping -->
+        <NuxtLink to="/web-scraping" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl group relative overflow-hidden transition-all duration-300 hover:shadow-xl border-2 border-green-200 hover:border-green-300 cursor-pointer">
           <div class="absolute top-4 right-4">
             <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 border border-green-200">Available</span>
           </div>
@@ -284,39 +233,8 @@
           </div>
         </NuxtLink>
 
-        <!-- Web Scraping - Login Required (when not authenticated) -->
-        <div v-else @click="showLoginModal = true" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl group relative overflow-hidden transition-all duration-300 hover:shadow-xl border-2 border-yellow-200 hover:border-yellow-300 cursor-pointer">
-          <div class="absolute top-4 right-4">
-            <span class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">Login Required</span>
-          </div>
-          <div class="p-8">
-            <div class="flex flex-col space-y-6">
-              <div class="self-start p-4 rounded-xl transition-colors bg-yellow-100 group-hover:bg-yellow-200">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe text-yellow-700">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
-                  <path d="M2 12h20"></path>
-                </svg>
-              </div>
-              <div class="space-y-3">
-                <h3 class="text-xl text-gray-900">Web Scraping</h3>
-                <p class="text-gray-600 leading-relaxed">Extract publications and research data from FAO and other sources</p>
-              </div>
-              <div class="pt-4">
-                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 w-full bg-yellow-600 hover:bg-yellow-700 text-white group-hover:translate-x-1 transition-transform">
-                  Login to Access
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock ml-2 h-4 w-4">
-                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- AI Chat - Requires Login -->
-        <NuxtLink v-if="user" to="/ai-chat" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl group relative overflow-hidden transition-all duration-300 hover:shadow-xl border-2 border-green-200 hover:border-green-300 cursor-pointer">
+        <!-- AI Chat -->
+        <NuxtLink to="/ai-chat" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl group relative overflow-hidden transition-all duration-300 hover:shadow-xl border-2 border-green-200 hover:border-green-300 cursor-pointer">
           <div class="absolute top-4 right-4">
             <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 border border-green-200">Available</span>
           </div>
@@ -343,35 +261,6 @@
             </div>
           </div>
         </NuxtLink>
-
-        <!-- AI Chat - Login Required (when not authenticated) -->
-        <div v-else @click="showLoginModal = true" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl group relative overflow-hidden transition-all duration-300 hover:shadow-xl border-2 border-yellow-200 hover:border-yellow-300 cursor-pointer">
-          <div class="absolute top-4 right-4">
-            <span class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">Login Required</span>
-          </div>
-          <div class="p-8">
-            <div class="flex flex-col space-y-6">
-              <div class="self-start p-4 rounded-xl transition-colors bg-yellow-100 group-hover:bg-yellow-200">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle text-yellow-700">
-                  <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
-                </svg>
-              </div>
-              <div class="space-y-3">
-                <h3 class="text-xl text-gray-900">AI Chat</h3>
-                <p class="text-gray-600 leading-relaxed">Chat with AI assistant specialized in IGAD agricultural development</p>
-              </div>
-              <div class="pt-4">
-                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 w-full bg-yellow-600 hover:bg-yellow-700 text-white group-hover:translate-x-1 transition-transform">
-                  Login to Access
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock ml-2 h-4 w-4">
-                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <!-- Agribusiness Hub - Coming Soon -->
         <div class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl group relative overflow-hidden transition-all duration-300 hover:shadow-xl border-2 border-gray-200 opacity-75">
@@ -421,61 +310,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+const { isLoggedIn, userName, checkAuth, logout } = useAuth()
 
-const user = ref<any>(null)
-const showLoginModal = ref(false)
-const loginEmail = ref('')
-const loginPassword = ref('')
-const loginError = ref('')
-const loginLoading = ref(false)
-
-const checkAuth = async () => {
-  try {
-    const auth = await $fetch('/api/auth/me')
-    if (auth.authenticated) {
-      user.value = auth.user
-    }
-  } catch (error) {
-    console.error('Error checking auth:', error)
-  }
-}
-
-const login = async () => {
-  loginLoading.value = true
-  loginError.value = ''
-  
-  try {
-    const data = await $fetch('/api/auth/login', {
-      method: 'POST',
-      body: { 
-        email: loginEmail.value,
-        password: loginPassword.value
-      }
-    })
-    
-    if (data.success) {
-      user.value = data.user
-      showLoginModal.value = false
-      loginEmail.value = ''
-      loginPassword.value = ''
-    } else {
-      loginError.value = data.error || 'Login failed'
-    }
-  } catch (error: any) {
-    loginError.value = error.message || 'Login failed'
-  } finally {
-    loginLoading.value = false
-  }
-}
-
-const logout = async () => {
-  try {
-    await $fetch('/api/auth/logout')
-    user.value = null
-  } catch (error) {
-    console.error('Error logging out:', error)
-  }
+const handleLogout = () => {
+  logout()
 }
 
 onMounted(() => {

@@ -17,19 +17,12 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Get all prompts for this type with user info
+    // Get all prompts for this type
     // Active prompts first, then by date
     const { results } = await db.prepare(`
-      SELECT p.*,
-        u1.name as created_by_name,
-        u1.email as created_by_email,
-        u2.name as updated_by_name,
-        u2.email as updated_by_email
-      FROM prompts p
-      JOIN users u1 ON p.created_by = u1.id
-      JOIN users u2 ON p.updated_by = u2.id
-      WHERE p.type = ?
-      ORDER BY p.is_active DESC, p.created_at DESC
+      SELECT * FROM prompts
+      WHERE type = ?
+      ORDER BY is_active DESC, created_at DESC
       LIMIT 100
     `).bind(type).all()
 
