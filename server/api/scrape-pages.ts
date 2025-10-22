@@ -4,7 +4,6 @@ import puppeteer from '@cloudflare/puppeteer'
 // CONFIGURATION - Adjust these variables
 // ============================================
 const MAX_PAGES_TO_SCRAPE = 2              // Number of pages to navigate
-const PUBLICATIONS_PER_PAGE = 2            // Publications to extract per page
 const MAX_AI_RETRIES = 3                   // Maximum AI consultation attempts
 
 interface Publication {
@@ -40,7 +39,6 @@ export default defineEventHandler(async (event) => {
     console.log('🚀 Iniciando scraping de publicaciones...')
     console.log('📍 URL:', targetUrl)
     console.log('📄 Páginas a revisar:', MAX_PAGES_TO_SCRAPE)
-    console.log('📊 Publicaciones por página:', PUBLICATIONS_PER_PAGE)
 
     const browser = await puppeteer.launch(browserBinding)
     const page = await browser.newPage()
@@ -65,61 +63,45 @@ export default defineEventHandler(async (event) => {
       const currentHTML = await page.content()
       const currentUrl = page.url()
 
-      console.log(`🔍 Extrayendo ${PUBLICATIONS_PER_PAGE} publicaciones...`)
+      console.log(`🔍 Extrayendo publicaciones con regex pattern...`)
 
-      // Extract publications from current page using AI
-      const extractionPrompt = `Extract exactly ${PUBLICATIONS_PER_PAGE} publications from this HTML.
-
-HTML Content (first 15000 chars):
-${currentHTML.substring(0, 15000)}
-
-Return ONLY a JSON array with exactly ${PUBLICATIONS_PER_PAGE} publications (no markdown, no explanations):
-[
-  {
-    "title": "publication title",
-    "url": "publication URL if exists",
-    "description": "description/summary if exists",
-    "date": "publication date if exists",
-    "image": "image URL if exists"
-  }
-]
-
-IMPORTANT RULES:
-- Extract ONLY ${PUBLICATIONS_PER_PAGE} publications (the first ${PUBLICATIONS_PER_PAGE} you find)
-- Return ONLY valid JSON array
-- DO NOT include any markdown or explanations
-- If a field doesn't exist, omit it or set to null
-- Look for patterns like: titles, links, descriptions in list items or article elements`
-
-      const extractionResponse = await ai.run("@cf/meta/llama-3.1-8b-instruct", {
-        messages: [
-          {
-            role: "system",
-            content: "You are an expert at extracting structured data from HTML. You return ONLY valid JSON arrays, never markdown or explanations."
-          },
-          {
-            role: "user",
-            content: extractionPrompt
-          }
-        ],
-        temperature: 0.1,
-        max_tokens: 2000
-      })
-
-      // Parse extracted publications
+      // Extract publications using simple regex patterns (faster than AI)
       try {
-        const responseText = extractionResponse.response || JSON.stringify(extractionResponse)
-        const jsonMatch = responseText.match(/\[[\s\S]*\]/)
+        // Find all publication blocks
+        const publicationBlocks = currentHTML.match(/<div class="d-list d-list-publication">[\s\S]*?<\/div>\s*<\/div>/g) || []
 
-        if (jsonMatch) {
-          const publications = JSON.parse(jsonMatch[0])
-          allPublications.push(...publications)
-          console.log(`✅ Extraídas ${publications.length} publicaciones de página ${currentPageNumber}`)
-        } else {
-          console.log(`⚠️ No se pudieron extraer publicaciones de página ${currentPageNumber}`)
+        console.log(`📦 Encontrados ${publicationBlocks.length} bloques de publicaciones`)
+
+        for (const block of publicationBlocks) {
+          // Extract title
+          const titleMatch = block.match(/<h5[^>]*class="title-link"[^>]*>[\s\S]*?<a[^>]*href="([^"]*)"[^>]*>([^<]+)<\/a>/i) ||
+                           block.match(/<a[^>]*class="[^"]*aaa[^"]*"[^>]*href="([^"]*)"[^>]*>([^<]+)<\/a>/i)
+
+          // Extract date
+          const dateMatch = block.match(/<h6[^>]*class="date"[^>]*>([^<]+)<\/h6>/i)
+
+          // Extract description
+          const descMatch = block.match(/<p>\s*([\s\S]*?)\s*<\/p>/i)
+
+          // Extract image
+          const imageMatch = block.match(/<img[^>]*src="([^"]+)"/i)
+
+          if (titleMatch) {
+            const publication: Publication = {
+              title: titleMatch[2].trim(),
+              url: titleMatch[1].startsWith('http') ? titleMatch[1] : `https://www.fao.org${titleMatch[1]}`,
+              description: descMatch ? descMatch[1].trim().substring(0, 500) : null,
+              date: dateMatch ? dateMatch[1].trim() : null,
+              image: imageMatch ? imageMatch[1] : null
+            }
+
+            allPublications.push(publication)
+          }
         }
-      } catch (parseError) {
-        console.log(`❌ Error parseando publicaciones de página ${currentPageNumber}:`, parseError)
+
+        console.log(`✅ Extraídas ${publicationBlocks.length} publicaciones de página ${currentPageNumber}`)
+      } catch (extractError) {
+        console.log(`❌ Error extrayendo publicaciones:`, extractError)
       }
 
       // If we've processed all pages, stop
@@ -134,22 +116,24 @@ IMPORTANT RULES:
       const previousUrl = page.url()
       let navigated = false
 
-      // Try common pagination selectors
-      const paginationSelectors = [
-        `a[aria-label="Next"]`,
-        `a.page-link:has-text("${currentPageNumber + 1}")`,
-        `.pagination a:has-text("${currentPageNumber + 1}")`,
-        `a[href*="/${currentPageNumber + 1}/"]`,
-        `.page-item a:has-text("${currentPageNumber + 1}")`,
-        `li.page-item:nth-child(${currentPageNumber + 1}) a`
+      // Try common pagination patterns first (faster, no AI needed)
+      console.log(`   🔍 Buscando paginación con patrones comunes...`)
+
+      const commonSelectors = [
+        `a.page-link[href*="/${currentPageNumber + 1}/"]`,
+        `a[href*="/publications/${currentPageNumber + 1}/"]`,
+        `.pagination a[href*="/${currentPageNumber + 1}/"]`,
+        `li.page-item a[href*="${currentPageNumber + 1}"]`
       ]
 
-      for (const selector of paginationSelectors) {
+      for (const selector of commonSelectors) {
         try {
-          console.log(`   Probando selector: ${selector}`)
+          console.log(`   Probando: ${selector}`)
           const nextButton = await page.$(selector)
 
           if (nextButton) {
+            console.log(`   ✅ Encontrado! Haciendo click...`)
+
             await Promise.race([
               nextButton.click().then(() => page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 5000 }).catch(() => {})),
               new Promise(resolve => setTimeout(resolve, 5000))
@@ -157,69 +141,24 @@ IMPORTANT RULES:
 
             await new Promise(resolve => setTimeout(resolve, 2000))
 
-            // Verify navigation using AI
+            // Verify navigation by checking URL change
             const newUrl = page.url()
-            const newHTML = await page.content()
 
-            console.log(`   🤖 Verificando si cambió de página...`)
+            console.log(`   🔍 Verificando navegación...`)
+            console.log(`   📍 URL anterior: ${previousUrl}`)
+            console.log(`   📍 URL nueva: ${newUrl}`)
 
-            const verificationPrompt = `Compare these two HTML snippets and determine if they represent DIFFERENT pages.
-
-Previous URL: ${previousUrl}
-New URL: ${newUrl}
-
-Previous HTML (first 8000 chars):
-${currentHTML.substring(0, 8000)}
-
-New HTML (first 8000 chars):
-${newHTML.substring(0, 8000)}
-
-Return ONLY a JSON object (no markdown):
-{
-  "isDifferentPage": true/false,
-  "reason": "brief explanation why they are different or same"
-}
-
-Look for:
-- Different URLs
-- Different publication titles
-- Different pagination states
-- Different content`
-
-            const verificationResponse = await ai.run("@cf/meta/llama-3.1-8b-instruct", {
-              messages: [
-                {
-                  role: "system",
-                  content: "You are an expert at comparing web pages. Return ONLY valid JSON."
-                },
-                {
-                  role: "user",
-                  content: verificationPrompt
-                }
-              ],
-              temperature: 0.1,
-              max_tokens: 200
-            })
-
-            const verifyText = verificationResponse.response || JSON.stringify(verificationResponse)
-            const verifyMatch = verifyText.match(/\{[\s\S]*\}/)
-
-            if (verifyMatch) {
-              const verification = JSON.parse(verifyMatch[0])
-              console.log(`   📊 IA dice: ${verification.reason}`)
-
-              if (verification.isDifferentPage) {
-                navigated = true
-                currentPageNumber++
-                console.log(`   ✅ Navegación exitosa a página ${currentPageNumber}`)
-                break
-              } else {
-                console.log(`   ⚠️ La página no cambió, probando siguiente selector...`)
-              }
+            // Simple URL comparison
+            if (newUrl !== previousUrl && newUrl.includes(`${currentPageNumber + 1}`)) {
+              navigated = true
+              currentPageNumber++
+              console.log(`   ✅ Navegación exitosa a página ${currentPageNumber}`)
+              break
+            } else {
+              console.log(`   ⚠️ La URL no cambió correctamente`)
             }
           }
         } catch (error) {
-          console.log(`   ❌ Falló selector: ${selector}`)
           continue
         }
       }
@@ -320,7 +259,7 @@ Look for:
       publications: allPublications,
       config: {
         maxPagesToScrape: MAX_PAGES_TO_SCRAPE,
-        publicationsPerPage: PUBLICATIONS_PER_PAGE,
+        maxAIRetries: MAX_AI_RETRIES,
         aiRetriesUsed: aiRetryCount
       }
     }
