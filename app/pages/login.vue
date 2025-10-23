@@ -83,9 +83,9 @@
 const router = useRouter()
 const { login } = useAuth()
 
-const email = ref('')
-const password = ref('')
-const rememberMe = ref(false)
+const email = ref('demo.user@igad.int')
+const password = ref('demo123')
+const rememberMe = ref(true)
 
 const handleLogin = () => {
   // Extract name from email or use a default
