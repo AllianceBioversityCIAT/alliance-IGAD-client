@@ -202,66 +202,6 @@
           </div>
         </div>
 
-        <!-- Web Scraping -->
-        <NuxtLink to="/web-scraping" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl group relative overflow-hidden transition-all duration-300 hover:shadow-xl border-2 border-green-200 hover:border-green-300 cursor-pointer">
-          <div class="absolute top-4 right-4">
-            <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 border border-green-200">Available</span>
-          </div>
-          <div class="p-8">
-            <div class="flex flex-col space-y-6">
-              <div class="self-start p-4 rounded-xl transition-colors bg-green-100 group-hover:bg-green-200">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe text-green-700">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
-                  <path d="M2 12h20"></path>
-                </svg>
-              </div>
-              <div class="space-y-3">
-                <h3 class="text-xl text-gray-900">Web Scraping</h3>
-                <p class="text-gray-600 leading-relaxed">Extract publications and research data from FAO and other sources</p>
-              </div>
-              <div class="pt-4">
-                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 w-full bg-green-600 hover:bg-green-700 text-white group-hover:translate-x-1 transition-transform">
-                  Launch Tool
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right ml-2 h-4 w-4">
-                    <path d="M5 12h14"></path>
-                    <path d="m12 5 7 7-7 7"></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </NuxtLink>
-
-        <!-- AI Chat -->
-        <NuxtLink to="/ai-chat" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl group relative overflow-hidden transition-all duration-300 hover:shadow-xl border-2 border-green-200 hover:border-green-300 cursor-pointer">
-          <div class="absolute top-4 right-4">
-            <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 border border-green-200">Available</span>
-          </div>
-          <div class="p-8">
-            <div class="flex flex-col space-y-6">
-              <div class="self-start p-4 rounded-xl transition-colors bg-green-100 group-hover:bg-green-200">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle text-green-700">
-                  <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
-                </svg>
-              </div>
-              <div class="space-y-3">
-                <h3 class="text-xl text-gray-900">AI Chat</h3>
-                <p class="text-gray-600 leading-relaxed">Chat with AI assistant specialized in IGAD agricultural development</p>
-              </div>
-              <div class="pt-4">
-                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 w-full bg-green-600 hover:bg-green-700 text-white group-hover:translate-x-1 transition-transform">
-                  Launch Tool
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right ml-2 h-4 w-4">
-                    <path d="M5 12h14"></path>
-                    <path d="m12 5 7 7-7 7"></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </NuxtLink>
-
         <!-- Agribusiness Hub - Coming Soon -->
         <div class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl group relative overflow-hidden transition-all duration-300 hover:shadow-xl border-2 border-gray-200 opacity-75">
           <div class="absolute top-4 right-4">
