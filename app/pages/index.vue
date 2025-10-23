@@ -1,32 +1,48 @@
 <template>
   <div class="min-h-screen bg-background">
     <!-- Navigation Bar -->
-    <div class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <div class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
       <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-16">
-          <div class="flex items-center gap-6">
-            <NuxtLink to="/" class="flex items-center gap-2">
-              <img src="/igad-logo.png" alt="IGAD Logo" class="h-8 w-auto" />
-              <span class="text-lg font-semibold text-green-800">IGAD AI Hub</span>
-            </NuxtLink>
-            <nav class="flex items-center gap-4">
-              <NuxtLink to="/web-scraping" class="text-gray-600 hover:text-green-600 transition-colors">
-                Web Scraping
-              </NuxtLink>
-              <NuxtLink to="/ai-chat" class="text-gray-600 hover:text-green-600 transition-colors">
-                AI Chat
-              </NuxtLink>
-            </nav>
+          <div class="flex items-center space-x-3">
+            <img src="/igad-logo.png" alt="IGAD - Intergovernmental Authority on Development" class="h-10 w-auto" />
           </div>
-          
-          <div class="flex items-center gap-4">
+
+          <div class="flex items-center space-x-2">
             <template v-if="isLoggedIn">
-              <span class="text-gray-600">Hello, <strong>{{ userName }}</strong></span>
-              <NuxtLink to="/prompts" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
-                Manage Prompts
-              </NuxtLink>
-              <button @click="handleLogout" class="px-4 py-2 rounded-md border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium transition-colors">
-                Logout
+              <button class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] h-8 rounded-md gap-1.5 px-3 text-gray-700 hover:text-green-700 hover:bg-green-50">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard h-4 w-4 mr-2">
+                  <rect width="7" height="9" x="3" y="3" rx="1"></rect>
+                  <rect width="7" height="5" x="14" y="3" rx="1"></rect>
+                  <rect width="7" height="9" x="14" y="12" rx="1"></rect>
+                  <rect width="7" height="5" x="3" y="16" rx="1"></rect>
+                </svg>
+                <span class="hidden sm:inline">Dashboard</span>
+              </button>
+
+              <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] size-9 rounded-md relative hover:bg-green-50">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell h-5 w-5 text-gray-700">
+                  <path d="M10.268 21a2 2 0 0 0 3.464 0"></path>
+                  <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path>
+                </svg>
+                <span class="rounded-md border font-medium whitespace-nowrap shrink-0 gap-1 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-[color,box-shadow] overflow-hidden border-transparent absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500 text-white text-xs">2</span>
+              </button>
+
+              <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] size-9 rounded-md hover:bg-green-50">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings h-5 w-5 text-gray-700">
+                  <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+
+              <button class="justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] h-9 px-4 py-2 flex items-center space-x-2 hover:bg-green-50">
+                <div class="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user h-5 w-5 text-white">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <span class="hidden md:inline text-gray-700">My Account</span>
               </button>
             </template>
             <NuxtLink v-else to="/login" class="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium transition-colors">
